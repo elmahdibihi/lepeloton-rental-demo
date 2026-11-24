@@ -4,195 +4,237 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Le Peloton Café — Paris Bike Rental</title>
-  <meta name="description" content="Rent carbon road, gravel, city and family bikes directly from Le Peloton Café in the Marais, Paris. Instant pricing, real frame sizes, and per-bike pedal setup.">
+  <meta name="description" content="Carbon road, gravel, and city bike rentals from Le Peloton Café in Le Marais, Paris.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="#top" aria-label="Le Peloton Café Bike Rental">
-        <span class="brand-crest">
-          <img
-            src="https://storage.googleapis.com/brm-cdn/store/lepelotoncafe/shop-logo-orig.png?v=1794838440381"
-            alt="Le Peloton Café"
-            referrerpolicy="no-referrer"
-            width="92"
-            height="34"
-          >
-        </span>
-        <span class="brand-meta" id="brandSub">Marais, Paris · Bike Rental</span>
+  <header class="site-nav" id="siteNav">
+    <div class="nav-pill" id="navPill">
+      <a class="brand" href="#hero" aria-label="Le Peloton Café">
+        <img class="logo-dark" src="./assets/img/peloton-wordmark.png" alt="Le Peloton Café">
+        <img class="logo-light" src="./assets/img/peloton-wordmark.png" alt="Le Peloton Café">
       </a>
 
-      <div class="header-actions">
-        <div class="lang-switch" role="group" aria-label="Language">
-          <button type="button" class="lang-btn" data-lang="en" aria-pressed="true">EN</button>
-          <button type="button" class="lang-btn" data-lang="fr" aria-pressed="false">FR</button>
-        </div>
-        <button type="button" class="bag-trigger" id="bagTrigger" aria-label="Open rental bag">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#story" id="navStoryLink">Morning ritual</a>
+        <a href="#fleet" id="navFleetLink">Fleet</a>
+        <a href="#clubhouse" id="navClubhouseLink">Clubhouse</a>
+      </nav>
+
+      <div class="nav-right">
+        <div class="gliding-seg seg-lang" id="langSeg" role="radiogroup" aria-label="Language"></div>
+        <button type="button" class="nav-bag-btn" id="navBagBtn" aria-label="Open rental bag">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M6 7h12l1 13H5L6 7z"></path>
             <path d="M9 7V5a3 3 0 0 1 6 0v2"></path>
           </svg>
-          <span id="bagBtnLabel">Bag</span>
-          <span class="bag-badge" id="bagCount">0</span>
-          <span class="bag-total" id="bagHeaderTotal" hidden>€0</span>
+          <span id="navBagLabel">Bag</span>
+          <span class="nav-bag-count" id="navBagCount">0</span>
         </button>
       </div>
     </div>
   </header>
 
-  <main id="top" class="container main-content">
-    <section class="booking-header" aria-labelledby="heroTitle">
-      <div class="hero-copy">
-        <h1 id="heroTitle">Bike rentals from Le Peloton Café</h1>
-        <p id="heroSub" class="hero-sub">17 Rue du Pont Louis Philippe · Helmet &amp; kit included · 20% VAT incl.</p>
+  <main>
+    <section class="hero" id="hero">
+      <div class="hero-media">
+        <img src="./assets/img/hero-rides.jpg" alt="Cyclists in Le Peloton Café jerseys riding on a quiet tree-lined French road">
+        <div class="hero-scrim"></div>
       </div>
 
-      <form class="booking-bar" id="bookingBar" onsubmit="return false" aria-label="Rental schedule and rider fit filters">
-        <div class="field-group">
-          <label for="pickupDate" id="lblPickupDate">Pickup date</label>
-          <input type="date" id="pickupDate" required>
+      <div class="wrap hero-content">
+        <p class="hero-kicker hero-enter" style="--stagger: 0" id="heroKicker">17 Rue du Pont Louis-Philippe · Le Marais</p>
+        <h1 class="hero-title hero-enter" style="--stagger: 1" id="heroTitle">Espresso at eight.<br>Chevreuse by nine.</h1>
+        <p class="hero-sub hero-enter" style="--stagger: 2" id="heroSub">Carbon road, gravel, and Marais city bikes tuned inside our café—fitted to your height and pedals before you clip in.</p>
+        <div class="hero-actions hero-enter" style="--stagger: 3">
+          <a href="#fleet" class="btn-yellow" id="heroCtaPrimary">Explore the fleet</a>
+          <a href="#story" class="btn-glass" id="heroCtaSecondary">The morning ritual</a>
         </div>
-
-        <div class="field-group">
-          <label for="pickupTime" id="lblPickupTime">Pickup time</label>
-          <select id="pickupTime"></select>
-        </div>
-
-        <div class="field-group field-duration">
-          <label for="durationSelect" id="lblDuration">Duration</label>
-          <div class="duration-controls">
-            <select id="durationSelect"></select>
-            <div class="custom-days-wrap" id="customDaysWrap" hidden>
-              <input type="number" id="customDaysInput" min="1" max="30" value="4" aria-label="Custom rental days">
-              <span id="lblDaysUnit">days</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label for="heightFilter" id="lblRiderHeight">Rider height</label>
-          <select id="heightFilter"></select>
-        </div>
-
-        <div class="return-pill" aria-live="polite">
-          <span class="return-label" id="lblReturnPreview">Return:</span>
-          <strong id="returnValue">—</strong>
-        </div>
-      </form>
+      </div>
     </section>
 
-    <nav class="category-bar" aria-label="Bike categories">
-      <div class="category-pills" id="categoryPills"></div>
-      <p class="fleet-count" id="fleetCount" aria-live="polite"></p>
-    </nav>
+    <section class="story-band" id="story" aria-labelledby="storyHeading">
+      <div class="wrap story-grid">
+        <div class="story-track-col">
+          <h2 class="sr-only" id="storyHeading">Morning ritual at Le Peloton Café</h2>
+          <div class="story-rail" aria-hidden="true">
+            <div class="story-rail-fill" id="storyRailFill"></div>
+          </div>
+          <div class="story-chapters" id="storyChapters"></div>
+        </div>
 
-    <section class="bike-grid" id="bikeGrid" aria-label="Available bikes"></section>
+        <div class="story-stage-col">
+          <div class="story-frame" id="storyFrame"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="fleet-band" id="fleet" aria-labelledby="fleetHeading">
+      <div class="wrap">
+        <div class="fleet-head">
+          <div>
+            <h2 class="fleet-title" id="fleetHeading">Choose your ride</h2>
+            <p class="fleet-meta" id="fleetMeta">Helmet &amp; repair kit included · 20% French VAT incl.</p>
+          </div>
+        </div>
+
+        <div class="control-deck">
+          <div class="deck-row deck-schedule">
+            <div class="deck-field">
+              <label for="pickupDate" id="lblPickupDate">Pickup</label>
+              <input type="date" id="pickupDate" required>
+            </div>
+            <div class="deck-field">
+              <label for="pickupTime" id="lblPickupTime">Time</label>
+              <select id="pickupTime"></select>
+            </div>
+            <div class="deck-field deck-duration">
+              <span class="field-caption" id="lblDuration">Duration</span>
+              <div class="duration-inline">
+                <div class="gliding-seg seg-duration" id="durationSeg" role="radiogroup" aria-labelledby="lblDuration"></div>
+                <div class="custom-days-wrap" id="customDaysWrap" hidden>
+                  <input type="number" id="customDaysInput" min="1" max="30" value="4" aria-label="Days">
+                  <span id="lblDaysUnit">d</span>
+                </div>
+              </div>
+            </div>
+            <div class="deck-return" aria-live="polite">
+              <span class="field-caption" id="lblReturnPreview">Return</span>
+              <strong id="returnValue">—</strong>
+            </div>
+          </div>
+
+          <hr class="deck-rule">
+
+          <div class="deck-row deck-filters">
+            <div class="gliding-seg seg-category" id="categorySeg" role="radiogroup" aria-label="Bike category"></div>
+            <div class="height-strip-wrap">
+              <span class="field-caption" id="lblHeight">Rider height</span>
+              <div class="gliding-seg seg-height" id="heightSeg" role="radiogroup" aria-labelledby="lblHeight"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fleet-grid" id="bikeGrid"></div>
+      </div>
+    </section>
+
+    <section class="clubhouse-band" id="clubhouse" aria-labelledby="clubhouseHeading">
+      <div class="wrap clubhouse-grid">
+        <div class="clubhouse-info">
+          <img class="clubhouse-neon" src="./assets/img/peloton-neon.png" alt="Le Peloton Café neon sign">
+          <p class="clubhouse-eyebrow" id="clubhouseEyebrow">Bike shop · Coffee · Waffles</p>
+          <h2 class="clubhouse-title" id="clubhouseHeading">Drop in before you roll.</h2>
+          <p class="clubhouse-body" id="clubhouseBody">Every rental starts at our counter in the 4th arrondissement—four minutes from Hôtel de Ville and the Seine banks.</p>
+
+          <dl class="clubhouse-meta">
+            <div>
+              <dt id="clubhouseAddressTitle">Address</dt>
+              <dd>17 Rue du Pont Louis-Philippe, 75004 Paris</dd>
+            </div>
+            <div>
+              <dt id="clubhouseHoursTitle">Pickup hours</dt>
+              <dd id="clubhouseHoursBody">Mon–Fri 08:00–16:00 · Sat–Sun 08:00–17:30</dd>
+            </div>
+          </dl>
+
+          <div class="clubhouse-links">
+            <a class="clubhouse-link" href="mailto:contact@lepelotoncafe.com">contact@lepelotoncafe.com</a>
+            <a class="clubhouse-link" id="clubhousePortalLink" href="https://app.booking.bike.rent/book?store=lepelotoncafe&offering=rental" target="_blank" rel="noopener noreferrer">Open live BRM portal</a>
+          </div>
+        </div>
+
+        <div class="clubhouse-gallery">
+          <div class="gallery-frame gallery-wide">
+            <img src="./assets/img/story-family.jpg" alt="Yuba Kombi yellow family cargo bike in Le Marais">
+          </div>
+          <div class="gallery-frame gallery-detail">
+            <img src="./assets/img/shifter-detail.jpg" alt="Shimano 105 shifter detail before departure">
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-info">
-        <strong>Le Peloton Café</strong> · 17 Rue du Pont Louis Philippe, 75004 Paris ·
-        <span id="footerHours">Open daily for pickups: Mon–Fri 08:00–16:00 · Sat–Sun 08:00–17:30</span>
-      </div>
-      <div class="footer-links">
-        <button type="button" class="link-btn" id="openCompareBtn">What we fixed vs current BRM (10 improvements)</button>
-        <a class="footer-ext" id="footerBrmLink" href="https://app.booking.bike.rent/book?store=lepelotoncafe&offering=rental" target="_blank" rel="noopener noreferrer">Live BRM site</a>
-      </div>
-    </div>
-  </footer>
+  <button type="button" class="bag-dock" id="bagDock" hidden aria-label="Open rental bag">
+    <span class="dock-dot" aria-hidden="true"></span>
+    <span id="dockCountLabel">1 bike</span>
+    <span class="dock-sep" aria-hidden="true">·</span>
+    <strong id="dockTotalLabel">€70</strong>
+    <span class="dock-cta" id="dockCtaLabel">Open bag</span>
+  </button>
 
-  <!-- Bike Configurator Modal -->
-  <div class="backdrop" id="bikeModalBackdrop" hidden>
-    <div class="modal" id="bikeModal" role="dialog" aria-modal="true" aria-labelledby="modalBikeTitle">
-      <div class="modal-header">
+  <div class="sheet-backdrop" id="bikeBackdrop" hidden>
+    <div class="sheet-modal" id="bikeModal" role="dialog" aria-modal="true" aria-labelledby="modalBikeTitle">
+      <div class="sheet-head">
         <div>
           <h2 id="modalBikeTitle"></h2>
-          <p class="modal-subtitle" id="modalBikeTagline"></p>
+          <p class="sheet-sub" id="modalBikeTagline"></p>
         </div>
-        <button type="button" class="icon-close" id="closeBikeModal" aria-label="Close">✕</button>
+        <button type="button" class="close-circle" id="closeBikeModal" aria-label="Close">✕</button>
       </div>
 
-      <div class="modal-body">
-        <div class="modal-hero-row">
-          <div class="modal-photo-wrap">
+      <div class="sheet-body">
+        <div class="modal-stage">
+          <div class="modal-bike-box">
             <img id="modalBikeImg" alt="" referrerpolicy="no-referrer">
+            <div class="wheel-shadow"></div>
           </div>
-          <div class="modal-desc-col">
+          <div class="modal-specs-col">
             <p id="modalBikeDesc"></p>
-            <h3 id="modalSpecsTitle">Included &amp; specs</h3>
-            <ul class="spec-list" id="modalSpecList"></ul>
+            <h3 id="modalSpecsTitle">Spec &amp; kit</h3>
+            <ul id="modalSpecList"></ul>
           </div>
         </div>
 
-        <form id="bikeConfigForm" onsubmit="return false">
-          <div class="config-section">
-            <div class="section-head">
+        <form onsubmit="return false">
+          <div class="cfg-block">
+            <div class="cfg-label-row">
               <label id="modalSizeLabel">Frame size</label>
-              <span class="size-guide-hint" id="modalSizeHint"></span>
+              <span class="cfg-hint" id="modalSizeHint"></span>
             </div>
-            <div class="size-radio-grid" id="modalSizeOptions" role="radiogroup" aria-labelledby="modalSizeLabel"></div>
+            <div class="tile-grid" id="modalSizeOptions" role="radiogroup" aria-labelledby="modalSizeLabel"></div>
           </div>
 
-          <div class="config-section" id="modalPedalsSection">
-            <label id="modalPedalsLabel">Pedal setup (this bike only)</label>
-            <div class="pedal-grid" id="modalPedalOptions" role="radiogroup" aria-labelledby="modalPedalsLabel"></div>
-            <p class="city-pedal-note" id="modalCityPedalNote" hidden></p>
+          <div class="cfg-block">
+            <label class="cfg-label" id="modalPedalsLabel">Pedal setup for this bike</label>
+            <div class="tile-grid tile-pedals" id="modalPedalOptions" role="radiogroup" aria-labelledby="modalPedalsLabel"></div>
+            <p class="city-note" id="modalCityPedalNote" hidden></p>
           </div>
 
-          <div class="config-section" id="modalExtrasSection">
-            <label id="modalExtrasLabel">Optional accessories</label>
-            <div class="extras-list" id="modalExtrasList"></div>
+          <div class="cfg-block" id="modalExtrasSection">
+            <label class="cfg-label" id="modalExtrasLabel">Accessories</label>
+            <div class="extras-stack" id="modalExtrasList"></div>
           </div>
 
-          <div class="config-section">
-            <label for="riderNameInput" id="modalRiderLabel">Rider label (optional — great for groups)</label>
-            <input type="text" id="riderNameInput" maxlength="40" placeholder="e.g. Alex or Rider 1">
+          <div class="cfg-block">
+            <label class="cfg-label" for="riderNameInput" id="modalRiderLabel">Rider name (optional)</label>
+            <input type="text" class="text-input" id="riderNameInput" maxlength="40" placeholder="Alex">
           </div>
         </form>
       </div>
 
-      <div class="modal-footer">
-        <div class="modal-price-box">
-          <span class="muted-label" id="modalTotalLabel">Bike total</span>
-          <strong class="modal-price" id="modalLiveTotal">€0</strong>
+      <div class="sheet-foot">
+        <div class="foot-price">
+          <span id="modalTotalLabel">Bike total</span>
+          <strong id="modalLiveTotal">€70</strong>
         </div>
-        <button type="button" class="btn-primary" id="modalAddBtn">Add bike to bag</button>
+        <button type="button" class="btn-yellow" id="modalAddBtn">Add to bag</button>
       </div>
     </div>
   </div>
 
-  <!-- Rental Bag & Fast Guest Checkout Drawer -->
-  <div class="backdrop backdrop-drawer" id="bagBackdrop" hidden>
-    <aside class="drawer" id="bagDrawer" role="dialog" aria-modal="true" aria-labelledby="bagDrawerTitle">
-      <div class="drawer-header">
-        <h2 id="bagDrawerTitle">Your rental bag</h2>
-        <button type="button" class="icon-close" id="closeBagDrawer" aria-label="Close">✕</button>
+  <div class="drawer-backdrop" id="bagBackdrop" hidden>
+    <aside class="bag-drawer" id="bagDrawer" role="dialog" aria-modal="true" aria-labelledby="bagDrawerTitle">
+      <div class="sheet-head">
+        <h2 id="bagDrawerTitle">Rental bag</h2>
+        <button type="button" class="close-circle" id="closeBagDrawer" aria-label="Close">✕</button>
       </div>
-
-      <div class="drawer-body" id="bagDrawerBody"></div>
+      <div class="sheet-body" id="bagDrawerBody"></div>
     </aside>
-  </div>
-
-  <!-- 10 Fixes Comparison Modal -->
-  <div class="backdrop" id="compareBackdrop" hidden>
-    <div class="modal modal-wide" id="compareModal" role="dialog" aria-modal="true" aria-labelledby="compareTitle">
-      <div class="modal-header">
-        <h2 id="compareTitle">10 Fixes vs Current BRM Site</h2>
-        <button type="button" class="icon-close" id="closeCompareModal" aria-label="Close">✕</button>
-      </div>
-      <div class="modal-body" id="compareBody"></div>
-    </div>
-  </div>
-
-  <!-- Confirmation Toast -->
-  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
-    <span id="toastText"></span>
-    <button type="button" class="toast-action" id="toastViewBagBtn">View bag</button>
   </div>
 
   <script type="module" src="./app.js"></script>

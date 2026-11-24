@@ -2,11 +2,11 @@ import {
   BIKES,
   CATEGORIES,
   DURATION_PRESETS,
-  FIXES,
   HEIGHT_OPTIONS,
   I18N,
   PEDAL_OPTIONS,
   STORE,
+  STORY_CHAPTERS,
   buildBrmDeepLink,
   computeBikePrice,
   computeReturnInfo,
@@ -34,6 +34,7 @@ const initCatObj = CATEGORIES.find((c) => c.id === initCatRaw || c.brmCategoryId
 
 const state = {
   lang: initLang,
+  activeChapter: 0,
   pickupDate: parisDateOffset(1),
   pickupTime: '09:00',
   durationKey: '1d',
@@ -42,8 +43,9 @@ const state = {
   category: initCatObj ? initCatObj.id : 'all',
   cardSizes: {},
   bag: [],
-  drawerMode: 'bag', // 'bag' | 'checkout' | 'confirmed'
+  drawerMode: 'bag',
   demoCustomer: null,
+  rollPrices: false,
   modal: {
     bikeId: null,
     sizeCode: null,
@@ -53,10 +55,10 @@ const state = {
     riderName: '',
   },
   lastTriggerEl: null,
-  toastTimer: null,
 };
 
 const el = (id) => document.getElementById(id);
+const segRegistry = new Map();
 
 function t() {
   return I18N[state.lang];
@@ -67,6 +69,82 @@ function fmtEuro(val) {
   const rounded = Number.isInteger(num) ? String(num) : num.toFixed(2);
   return state.lang === 'fr' ? `${rounded.replace('.', ',')} €` : `€${rounded}`;
 }
+
+function prefersReducedMotion() {
+  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function syncGlidingSegThumb(container, activeVal) {
+  const meta = segRegistry.get(container);
+  if (!meta) return;
+  const { base, overlay, buttons } = meta;
+  let activeBtn = null;
+  for (const [val, btn] of buttons.entries()) {
+    const isActive = val === activeVal;
+    btn.setAttribute('aria-checked', String(isActive));
+    if (isActive) activeBtn = btn;
+  }
+  if (!activeBtn) return;
+  meta.activeVal = activeVal;
+
+  const measure = () => {
+    const totalW = base.offsetWidth;
+    if (!totalW) return;
+    const left = activeBtn.offsetLeft;
+    const right = Math.max(0, totalW - (left + activeBtn.offsetWidth));
+    overlay.style.setProperty('--cl', `${left}px`);
+    overlay.style.setProperty('--cr', `${right}px`);
+  };
+  requestAnimationFrame(measure);
+}
+
+function renderGlidingSeg(container, options, activeVal, onSelect) {
+  const signature = options.map((o) => `${o.value}:${o.label}`).join('|');
+  const existing = segRegistry.get(container);
+  if (existing && existing.signature === signature) {
+    existing.onSelect = onSelect;
+    syncGlidingSegThumb(container, activeVal);
+    return;
+  }
+
+  container.replaceChildren();
+  const base = document.createElement('div');
+  base.className = 'seg-base';
+  const overlay = document.createElement('div');
+  overlay.className = 'seg-overlay';
+  overlay.setAttribute('aria-hidden', 'true');
+
+  const buttons = new Map();
+  const meta = { signature, base, overlay, buttons, activeVal, onSelect };
+  segRegistry.set(container, meta);
+
+  for (const opt of options) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('aria-checked', String(opt.value === activeVal));
+    btn.textContent = opt.label;
+    btn.addEventListener('click', () => {
+      meta.onSelect(opt.value);
+      btn.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+    });
+    base.appendChild(btn);
+    buttons.set(opt.value, btn);
+
+    const mirror = document.createElement('span');
+    mirror.textContent = opt.label;
+    overlay.appendChild(mirror);
+  }
+
+  container.append(base, overlay);
+  syncGlidingSegThumb(container, activeVal);
+}
+
+const segResizeObserver = new ResizeObserver(() => {
+  for (const [container, meta] of segRegistry.entries()) {
+    syncGlidingSegThumb(container, meta.activeVal);
+  }
+});
 
 function getStockUsedInBag(bikeId, sizeCode) {
   return state.bag.reduce(
@@ -88,8 +166,7 @@ function getPreferredCardSize(bike) {
   const heightMatches = getMatchingSizesForHeight(bike, state.heightFilter);
   const availableMatch = heightMatches.find((s) => getRemainingStock(bike, s) > 0);
   if (availableMatch) return availableMatch;
-  const anyAvailable = bike.sizes.find((s) => getRemainingStock(bike, s) > 0);
-  return anyAvailable || bike.sizes[0];
+  return bike.sizes.find((s) => getRemainingStock(bike, s) > 0) || bike.sizes[0];
 }
 
 function getEffectiveDaysCount() {
@@ -98,46 +175,150 @@ function getEffectiveDaysCount() {
   return preset ? preset.days : Math.max(1, Math.min(30, Number(state.customDays) || 4));
 }
 
-function formatDurationBadge(bike) {
+function formatDurationPeriod(bike) {
   const txt = t();
   if (state.durationKey === '4h') return txt.halfDayUnit;
   const days = getEffectiveDaysCount();
-  if (days === 1) return txt.perDayApprox;
+  if (days === 1) return txt.perDayUnit;
   const price = computeBikePrice(bike, state.durationKey, state.customDays);
   const perDay = Math.round((price / days) * 10) / 10;
   return state.lang === 'fr'
-    ? `${days} jours (${fmtEuro(perDay)}/j)`
+    ? `${days} j (${fmtEuro(perDay)}/j)`
     : `${days} days (${fmtEuro(perDay)}/day)`;
+}
+
+function getItemTotal(item) {
+  const bike = BIKES.find((b) => b.id === item.bikeId);
+  const base = computeBikePrice(bike, state.durationKey, state.customDays);
+  const pedal = PEDAL_OPTIONS.find((p) => p.id === item.pedalId)?.price || 0;
+  const extrasSum = item.extraIds.reduce((sum, eid) => {
+    const found = getAvailableExtrasForBike(bike).find((ex) => ex.id === eid);
+    return sum + (found ? found.price : 0);
+  }, 0);
+  return base + pedal + extrasSum;
+}
+
+function setActiveStoryChapter(index) {
+  state.activeChapter = index;
+  const chapters = el('storyChapters').querySelectorAll('.story-chapter');
+  const photos = el('storyFrame').querySelectorAll('.story-photo');
+  chapters.forEach((node, idx) => node.classList.toggle('is-active', idx === index));
+  photos.forEach((img, idx) => img.classList.toggle('is-active', idx === index));
+  el('storyRailFill').style.setProperty('--rail-progress', String((index + 1) / STORY_CHAPTERS.length));
+}
+
+function renderStorySection() {
+  const chaptersWrap = el('storyChapters');
+  const frameWrap = el('storyFrame');
+  chaptersWrap.replaceChildren();
+  frameWrap.replaceChildren();
+
+  STORY_CHAPTERS.forEach((ch, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `story-chapter${idx === state.activeChapter ? ' is-active' : ''}`;
+    btn.dataset.index = String(idx);
+
+    const time = document.createElement('span');
+    time.className = 'chapter-time';
+    time.textContent = ch.time[state.lang];
+
+    const h3 = document.createElement('h3');
+    h3.className = 'chapter-title';
+    h3.textContent = ch.title[state.lang];
+
+    const p = document.createElement('p');
+    p.className = 'chapter-body';
+    p.textContent = ch.body[state.lang];
+
+    btn.append(time, h3, p);
+    btn.addEventListener('click', () => setActiveStoryChapter(idx));
+    chaptersWrap.appendChild(btn);
+
+    const img = document.createElement('img');
+    img.className = `story-photo${idx === state.activeChapter ? ' is-active' : ''}`;
+    img.src = ch.image;
+    img.alt = ch.alt[state.lang];
+    img.loading = idx === 0 ? 'eager' : 'lazy';
+    frameWrap.appendChild(img);
+  });
+
+  setActiveStoryChapter(state.activeChapter);
+  observeStoryChapters();
+}
+
+let storyObserver = null;
+function observeStoryChapters() {
+  if (storyObserver) storyObserver.disconnect();
+  storyObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          setActiveStoryChapter(Number(entry.target.dataset.index));
+        }
+      }
+    },
+    { rootMargin: '-32% 0px -36% 0px', threshold: 0.2 }
+  );
+  for (const ch of el('storyChapters').querySelectorAll('.story-chapter')) {
+    storyObserver.observe(ch);
+  }
 }
 
 function syncStaticLabels() {
   const txt = t();
   document.documentElement.lang = state.lang;
-  el('brandSub').textContent = txt.brandSub;
-  el('bagBtnLabel').textContent = txt.cartBtn;
-  el('heroTitle').textContent = txt.heroTitle;
+  el('navStoryLink').textContent = txt.navStory;
+  el('navFleetLink').textContent = txt.navFleet;
+  el('navClubhouseLink').textContent = txt.navClubhouse;
+  el('navBagLabel').textContent = txt.bagLabel;
+
+  el('heroKicker').textContent = txt.heroKicker;
+  el('heroTitle').replaceChildren(...txt.heroTitle.split('\n').flatMap((line, i) => (i ? [document.createElement('br'), document.createTextNode(line)] : [document.createTextNode(line)])));
   el('heroSub').textContent = txt.heroSub;
+  el('heroCtaPrimary').textContent = txt.heroCtaPrimary;
+  el('heroCtaSecondary').textContent = txt.heroCtaSecondary;
+
+  el('fleetHeading').textContent = txt.fleetTitle;
+  el('fleetMeta').textContent = txt.fleetMeta;
   el('lblPickupDate').textContent = txt.pickupDate;
   el('lblPickupTime').textContent = txt.pickupTime;
   el('lblDuration').textContent = txt.duration;
   el('lblDaysUnit').textContent = txt.daysUnit;
-  el('lblRiderHeight').textContent = txt.riderHeight;
-  el('lblReturnPreview').textContent = txt.returnPreview;
-  el('footerHours').textContent = txt.footerHours;
-  el('openCompareBtn').textContent = txt.compareBtn;
-  el('compareTitle').textContent = txt.compareTitle;
-  el('bagDrawerTitle').textContent = txt.bagTitle;
-  el('toastViewBagBtn').textContent = txt.toastViewBag;
+  el('lblReturnPreview').textContent = txt.returnLabel;
+  el('lblHeight').textContent = txt.heightLabel;
 
-  for (const btn of document.querySelectorAll('.lang-btn')) {
-    btn.setAttribute('aria-pressed', String(btn.dataset.lang === state.lang));
-  }
+  el('clubhouseEyebrow').textContent = txt.clubhouseEyebrow;
+  el('clubhouseHeading').textContent = txt.clubhouseTitle;
+  el('clubhouseBody').textContent = txt.clubhouseBody;
+  el('clubhouseAddressTitle').textContent = txt.clubhouseAddressTitle;
+  el('clubhouseHoursTitle').textContent = txt.clubhouseHoursTitle;
+  el('clubhouseHoursBody').textContent = txt.clubhouseHoursBody;
+  el('clubhousePortalLink').textContent = txt.clubhousePortalLink;
+
+  el('bagDrawerTitle').textContent = txt.bagTitle;
 
   const activeCatObj = CATEGORIES.find((c) => c.id === state.category);
-  el('footerBrmLink').href = buildBrmDeepLink(activeCatObj?.brmCategoryId, state.lang);
+  el('clubhousePortalLink').href = buildBrmDeepLink(activeCatObj?.brmCategoryId, state.lang);
+
+  renderGlidingSeg(
+    el('langSeg'),
+    [
+      { value: 'en', label: 'EN' },
+      { value: 'fr', label: 'FR' },
+    ],
+    state.lang,
+    (val) => {
+      if (state.lang === val) return;
+      state.lang = val;
+      renderAll();
+      if (!el('bikeBackdrop').hidden) renderBikeModal();
+      if (!el('bagBackdrop').hidden) renderBagDrawer();
+    }
+  );
 }
 
-function syncScheduleControls() {
+function syncDeckControls() {
   const txt = t();
   const dateInput = el('pickupDate');
   const today = parisDateOffset(0);
@@ -159,56 +340,52 @@ function syncScheduleControls() {
     timeSelect.appendChild(opt);
   }
 
-  const durSelect = el('durationSelect');
-  durSelect.replaceChildren();
-  for (const p of DURATION_PRESETS) {
-    const opt = document.createElement('option');
-    opt.value = p.key;
-    opt.textContent = p.label[state.lang];
-    opt.selected = state.durationKey === p.key;
-    durSelect.appendChild(opt);
-  }
-  const customOpt = document.createElement('option');
-  customOpt.value = 'custom';
-  customOpt.textContent = txt.customDays;
-  customOpt.selected = state.durationKey === 'custom';
-  durSelect.appendChild(customOpt);
+  renderGlidingSeg(
+    el('durationSeg'),
+    [
+      ...DURATION_PRESETS.map((p) => ({ value: p.key, label: p.label[state.lang] })),
+      { value: 'custom', label: txt.customDays },
+    ],
+    state.durationKey,
+    (val) => {
+      state.durationKey = val;
+      state.rollPrices = true;
+      syncDeckControls();
+      renderBikeGrid();
+      syncBagIndicators();
+    }
+  );
 
   el('customDaysWrap').hidden = state.durationKey !== 'custom';
   el('customDaysInput').value = String(state.customDays);
 
-  const heightSel = el('heightFilter');
-  heightSel.replaceChildren();
-  for (const h of HEIGHT_OPTIONS) {
-    const opt = document.createElement('option');
-    opt.value = h.id;
-    opt.textContent = h.label[state.lang];
-    opt.selected = state.heightFilter === h.id;
-    heightSel.appendChild(opt);
-  }
-
   const ret = computeReturnInfo(state.pickupDate, state.pickupTime, state.durationKey, state.customDays);
   el('returnValue').textContent = `${ret.dateStr} · ${ret.timeStr}`;
-}
 
-function renderCategoryBar(visibleCount) {
-  const pillsWrap = el('categoryPills');
-  pillsWrap.replaceChildren();
-  for (const cat of CATEGORIES) {
-    const count =
-      cat.id === 'all' ? BIKES.length : BIKES.filter((b) => b.category === cat.id).length;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'cat-pill';
-    btn.textContent = `${cat.label[state.lang]} (${count})`;
-    btn.setAttribute('aria-pressed', String(state.category === cat.id));
-    btn.addEventListener('click', () => {
-      state.category = cat.id;
-      renderAll();
-    });
-    pillsWrap.appendChild(btn);
-  }
-  el('fleetCount').textContent = t().showingCount(visibleCount);
+  renderGlidingSeg(
+    el('categorySeg'),
+    CATEGORIES.map((c) => {
+      const count = c.id === 'all' ? BIKES.length : BIKES.filter((b) => b.category === c.id).length;
+      return { value: c.id, label: `${c.label[state.lang]} (${count})` };
+    }),
+    state.category,
+    (val) => {
+      state.category = val;
+      const activeCatObj = CATEGORIES.find((c) => c.id === val);
+      el('clubhousePortalLink').href = buildBrmDeepLink(activeCatObj?.brmCategoryId, state.lang);
+      renderBikeGrid();
+    }
+  );
+
+  renderGlidingSeg(
+    el('heightSeg'),
+    HEIGHT_OPTIONS.map((h) => ({ value: h.id, label: h.short[state.lang] })),
+    state.heightFilter,
+    (val) => {
+      state.heightFilter = val;
+      renderBikeGrid();
+    }
+  );
 }
 
 function renderBikeGrid() {
@@ -216,9 +393,11 @@ function renderBikeGrid() {
   const grid = el('bikeGrid');
   grid.replaceChildren();
 
-  let list = state.category === 'all' ? [...BIKES] : BIKES.filter((b) => b.category === state.category);
+  const shouldRoll = state.rollPrices;
+  state.rollPrices = false;
+
+  const list = state.category === 'all' ? [...BIKES] : BIKES.filter((b) => b.category === state.category);
   if (state.heightFilter !== 'all') {
-    // Keep fitting bikes first without hiding non-fitting models completely (dim non-matching instead).
     list.sort((a, b) => {
       const aFit = getMatchingSizesForHeight(a, state.heightFilter).some((s) => getRemainingStock(a, s) > 0) ? 0 : 1;
       const bFit = getMatchingSizesForHeight(b, state.heightFilter).some((s) => getRemainingStock(b, s) > 0) ? 0 : 1;
@@ -226,146 +405,137 @@ function renderBikeGrid() {
     });
   }
 
-  renderCategoryBar(list.length);
-
   for (const bike of list) {
     const fittingSizes = getMatchingSizesForHeight(bike, state.heightFilter);
     const hasHeightMatch =
       state.heightFilter === 'all' || fittingSizes.some((s) => getRemainingStock(bike, s) > 0);
     const selectedSize = getPreferredCardSize(bike);
     const remaining = getRemainingStock(bike, selectedSize);
-    const totalLeftAllSizes = bike.sizes.reduce((sum, s) => sum + getRemainingStock(bike, s), 0);
+    const totalLeft = bike.sizes.reduce((sum, s) => sum + getRemainingStock(bike, s), 0);
     const price = computeBikePrice(bike, state.durationKey, state.customDays);
 
     const card = document.createElement('article');
     card.className = `bike-card${hasHeightMatch ? '' : ' is-dimmed'}`;
 
-    const photoWrap = document.createElement('div');
-    photoWrap.className = 'bike-photo';
+    const stage = document.createElement('div');
+    stage.className = 'bike-stage';
 
     const img = document.createElement('img');
     img.src = bike.image;
     img.alt = bike.name;
     img.loading = 'lazy';
     img.setAttribute('referrerpolicy', 'no-referrer');
-    photoWrap.appendChild(img);
+
+    const shadow = document.createElement('div');
+    shadow.className = 'wheel-shadow';
+
+    stage.append(img, shadow);
 
     if (!hasHeightMatch) {
       const warn = document.createElement('span');
-      warn.className = 'card-badge card-badge-warn';
-      warn.textContent = txt.filterNoSizeBadge;
-      photoWrap.appendChild(warn);
+      warn.className = 'stage-badge is-warn';
+      warn.textContent = txt.filterNoSize;
+      stage.appendChild(warn);
     } else if (bike.badge) {
       const badge = document.createElement('span');
-      badge.className = 'card-badge';
+      badge.className = 'stage-badge';
       badge.textContent = bike.badge[state.lang];
-      photoWrap.appendChild(badge);
+      stage.appendChild(badge);
     }
 
-    const body = document.createElement('div');
-    body.className = 'bike-body';
+    const content = document.createElement('div');
+    content.className = 'bike-content';
 
-    const top = document.createElement('div');
-    top.className = 'bike-top';
+    const headRow = document.createElement('div');
+    headRow.className = 'bike-header-row';
 
     const titleCol = document.createElement('div');
-    const h2 = document.createElement('h2');
-    h2.className = 'bike-title';
-    h2.textContent = bike.name;
-    const tag = document.createElement('p');
-    tag.className = 'bike-tagline';
-    tag.textContent = bike.tagline[state.lang];
-    titleCol.append(h2, tag);
+    const h3 = document.createElement('h3');
+    h3.className = 'bike-name';
+    h3.textContent = bike.name;
+    const sub = document.createElement('p');
+    sub.className = 'bike-sub';
+    sub.textContent = bike.tagline[state.lang];
+    titleCol.append(h3, sub);
 
-    const priceBlock = document.createElement('div');
-    priceBlock.className = 'price-block';
-    const priceAmt = document.createElement('span');
-    priceAmt.className = 'price-amount';
-    priceAmt.textContent = fmtEuro(price);
-    const priceUnit = document.createElement('span');
-    priceUnit.className = 'price-unit';
-    priceUnit.textContent = formatDurationBadge(bike);
-    priceBlock.append(priceAmt, priceUnit);
+    const priceCol = document.createElement('div');
+    priceCol.className = 'price-col';
+    const fig = document.createElement('span');
+    fig.className = `price-figure${shouldRoll ? ' is-rolling' : ''}`;
+    fig.textContent = fmtEuro(price);
+    const per = document.createElement('span');
+    per.className = 'price-period';
+    per.textContent = formatDurationPeriod(bike);
+    priceCol.append(fig, per);
 
-    top.append(titleCol, priceBlock);
+    headRow.append(titleCol, priceCol);
 
-    const chips = document.createElement('div');
-    chips.className = 'spec-chips';
-    for (const c of bike.chips[state.lang]) {
-      const sp = document.createElement('span');
-      sp.className = 'spec-chip';
-      sp.textContent = c;
-      chips.appendChild(sp);
-    }
+    const specLine = document.createElement('p');
+    specLine.className = 'bike-spec-line';
+    specLine.textContent = bike.summaryLine[state.lang];
 
-    const sizeRow = document.createElement('div');
-    sizeRow.className = 'size-row';
+    const fitRow = document.createElement('div');
+    fitRow.className = 'bike-fit-row';
 
-    const sizePills = document.createElement('div');
-    sizePills.className = 'size-pills';
-
+    const pills = document.createElement('div');
+    pills.className = 'size-pills';
     for (const sz of bike.sizes) {
       const szLeft = getRemainingStock(bike, sz);
       const isFit = state.heightFilter !== 'all' && fittingSizes.some((f) => f.code === sz.code);
-      const pill = document.createElement('button');
-      pill.type = 'button';
-      pill.className = `size-pill${sz.code === selectedSize.code ? ' is-selected' : ''}${isFit ? ' is-height-match' : ''}`;
-      pill.textContent = sz.label;
-      pill.disabled = szLeft === 0;
-      pill.title = `${sz.heightLabel} · ${txt.inStock(szLeft)}`;
-      pill.addEventListener('click', () => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `size-btn${sz.code === selectedSize.code ? ' is-selected' : ''}${isFit ? ' is-fit' : ''}`;
+      btn.textContent = sz.label;
+      btn.disabled = szLeft === 0;
+      btn.title = `${sz.heightLabel} · ${txt.inStock(szLeft)}`;
+      btn.addEventListener('click', () => {
         state.cardSizes[bike.id] = sz.code;
         renderBikeGrid();
       });
-      sizePills.appendChild(pill);
+      pills.appendChild(btn);
     }
 
-    const stockLine = document.createElement('div');
-    stockLine.className = `stock-line${remaining === 0 ? ' is-empty' : ''}`;
-    stockLine.textContent =
+    const stockCap = document.createElement('span');
+    stockCap.className = `stock-caption${remaining === 0 ? ' is-empty' : ''}`;
+    stockCap.textContent =
       remaining > 0
         ? `${selectedSize.label} (${selectedSize.heightLabel}) · ${txt.inStock(remaining)}`
         : txt.noneLeft;
 
-    sizeRow.append(sizePills, stockLine);
+    fitRow.append(pills, stockCap);
 
-    const ctaWrap = document.createElement('div');
-    ctaWrap.className = 'card-cta';
+    const foot = document.createElement('div');
+    foot.className = 'bike-foot';
     const cta = document.createElement('button');
     cta.type = 'button';
-    cta.className = 'btn-primary';
-    cta.disabled = totalLeftAllSizes === 0;
-    cta.textContent = totalLeftAllSizes > 0 ? txt.configureBtn : txt.soldOutBtn;
+    cta.className = 'btn-yellow';
+    cta.disabled = totalLeft === 0;
+    cta.textContent = totalLeft > 0 ? txt.configureBtn : txt.soldOutBtn;
     cta.addEventListener('click', (ev) => openBikeModal(bike.id, selectedSize.code, ev.currentTarget));
-    ctaWrap.appendChild(cta);
+    foot.appendChild(cta);
 
-    body.append(top, chips, sizeRow, ctaWrap);
-    card.append(photoWrap, body);
+    content.append(headRow, specLine, fitRow, foot);
+    card.append(stage, content);
     grid.appendChild(card);
   }
 }
 
-function updateHeaderBag() {
-  const countEl = el('bagCount');
-  const totalEl = el('bagHeaderTotal');
-  countEl.textContent = String(state.bag.length);
-  const grandTotal = state.bag.reduce((sum, item) => sum + getItemTotal(item), 0);
-  totalEl.hidden = state.bag.length === 0;
-  totalEl.textContent = fmtEuro(grandTotal);
-}
+function syncBagIndicators() {
+  const txt = t();
+  const count = state.bag.length;
+  const total = state.bag.reduce((sum, item) => sum + getItemTotal(item), 0);
 
-function getItemTotal(item) {
-  const bike = BIKES.find((b) => b.id === item.bikeId);
-  const base = computeBikePrice(bike, state.durationKey, state.customDays);
-  const pedal = PEDAL_OPTIONS.find((p) => p.id === item.pedalId)?.price || 0;
-  const extrasSum = item.extraIds.reduce((sum, eid) => {
-    const found = getAvailableExtrasForBike(bike).find((ex) => ex.id === eid);
-    return sum + (found ? found.price : 0);
-  }, 0);
-  return base + pedal + extrasSum;
-}
+  el('navBagCount').textContent = String(count);
 
-/* ---------------- Bike Configurator Modal ---------------- */
+  const dock = el('bagDock');
+  const anyOverlayOpen = !el('bikeBackdrop').hidden || !el('bagBackdrop').hidden;
+  dock.hidden = count === 0 || anyOverlayOpen;
+  if (!dock.hidden) {
+    el('dockCountLabel').textContent = txt.dockCount(count);
+    el('dockTotalLabel').textContent = fmtEuro(total);
+    el('dockCtaLabel').textContent = txt.dockAction;
+  }
+}
 
 function openBikeModal(bikeId, preselectedSize, triggerEl) {
   const bike = BIKES.find((b) => b.id === bikeId);
@@ -387,7 +557,10 @@ function openBikeModal(bikeId, preselectedSize, triggerEl) {
   };
 
   renderBikeModal();
-  el('bikeModalBackdrop').hidden = false;
+  const backdrop = el('bikeBackdrop');
+  backdrop.classList.remove('is-closing');
+  backdrop.hidden = false;
+  syncBagIndicators();
   el('closeBikeModal').focus();
 }
 
@@ -419,8 +592,8 @@ function renderBikeModal() {
   sizeGrid.replaceChildren();
   for (const sz of bike.sizes) {
     const left = getRemainingStock(bike, sz);
-    const tile = document.createElement('label');
-    tile.className = `choice-tile${sz.code === state.modal.sizeCode ? ' is-checked' : ''}${left === 0 ? ' is-disabled' : ''}`;
+    const card = document.createElement('label');
+    card.className = `choice-card${sz.code === state.modal.sizeCode ? ' is-checked' : ''}${left === 0 ? ' is-disabled' : ''}`;
 
     const radio = document.createElement('input');
     radio.type = 'radio';
@@ -433,16 +606,16 @@ function renderBikeModal() {
       renderBikeModal();
     });
 
-    const title = document.createElement('span');
-    title.className = 'choice-title';
-    title.textContent = `${sz.label} (${left})`;
+    const main = document.createElement('span');
+    main.className = 'choice-main';
+    main.textContent = `${sz.label} (${left})`;
 
     const sub = document.createElement('span');
     sub.className = 'choice-sub';
     sub.textContent = sz.heightLabel;
 
-    tile.append(radio, title, sub);
-    sizeGrid.appendChild(tile);
+    card.append(radio, main, sub);
+    sizeGrid.appendChild(card);
   }
 
   el('modalPedalsLabel').textContent = txt.pedalsLabel;
@@ -458,8 +631,8 @@ function renderBikeModal() {
     pedalGrid.hidden = false;
     cityNote.hidden = true;
     for (const p of PEDAL_OPTIONS) {
-      const tile = document.createElement('label');
-      tile.className = `choice-tile${p.id === state.modal.pedalId ? ' is-checked' : ''}`;
+      const card = document.createElement('label');
+      card.className = `choice-card${p.id === state.modal.pedalId ? ' is-checked' : ''}`;
 
       const radio = document.createElement('input');
       radio.type = 'radio';
@@ -471,16 +644,16 @@ function renderBikeModal() {
         renderBikeModal();
       });
 
-      const title = document.createElement('span');
-      title.className = 'choice-title';
-      title.textContent = p.label[state.lang];
+      const main = document.createElement('span');
+      main.className = 'choice-main';
+      main.textContent = p.label[state.lang];
 
       const sub = document.createElement('span');
       sub.className = 'choice-sub';
       sub.textContent = p.detail[state.lang];
 
-      tile.append(radio, title, sub);
-      pedalGrid.appendChild(tile);
+      card.append(radio, main, sub);
+      pedalGrid.appendChild(card);
     }
   }
 
@@ -492,14 +665,14 @@ function renderBikeModal() {
   el('modalExtrasLabel').textContent = txt.extrasLabel;
 
   for (const ex of availExtras) {
-    const row = document.createElement('div');
-    row.className = 'extra-row';
+    const itemWrap = document.createElement('div');
+    itemWrap.className = 'extra-item';
 
-    const label = document.createElement('label');
-    label.className = 'extra-check-label';
+    const row = document.createElement('label');
+    row.className = 'extra-row-head';
 
-    const leftDiv = document.createElement('span');
-    leftDiv.className = 'extra-left';
+    const left = document.createElement('span');
+    left.className = 'extra-left';
 
     const cb = document.createElement('input');
     cb.type = 'checkbox';
@@ -510,37 +683,37 @@ function renderBikeModal() {
       renderBikeModal();
     });
 
-    const textWrap = document.createElement('span');
-    const title = document.createElement('span');
-    title.className = 'extra-title';
-    title.textContent = ex.label[state.lang];
+    const textCol = document.createElement('span');
+    const name = document.createElement('span');
+    name.className = 'extra-name';
+    name.textContent = ex.label[state.lang];
     const desc = document.createElement('span');
     desc.className = 'extra-desc';
     desc.textContent = ex.description[state.lang];
-    textWrap.append(title, desc);
-    leftDiv.append(cb, textWrap);
+    textCol.append(name, desc);
+    left.append(cb, textCol);
 
-    const priceSpan = document.createElement('span');
-    priceSpan.className = 'extra-price';
-    priceSpan.textContent = `+${fmtEuro(ex.price)}`;
+    const cost = document.createElement('span');
+    cost.className = 'extra-cost';
+    cost.textContent = `+${fmtEuro(ex.price)}`;
 
-    label.append(leftDiv, priceSpan);
-    row.appendChild(label);
+    row.append(left, cost);
+    itemWrap.appendChild(row);
 
     if (ex.needsNote && cb.checked) {
-      const noteInput = document.createElement('input');
-      noteInput.type = 'text';
-      noteInput.className = 'extra-note-input';
-      noteInput.maxLength = 40;
-      noteInput.placeholder = txt.childAgePlaceholder;
-      noteInput.value = state.modal.childAgeNote;
-      noteInput.addEventListener('input', (e) => {
+      const note = document.createElement('input');
+      note.type = 'text';
+      note.className = 'text-input';
+      note.maxLength = 40;
+      note.placeholder = txt.childAgePlaceholder;
+      note.value = state.modal.childAgeNote;
+      note.addEventListener('input', (e) => {
         state.modal.childAgeNote = e.target.value;
       });
-      row.appendChild(noteInput);
+      itemWrap.appendChild(note);
     }
 
-    extrasList.appendChild(row);
+    extrasList.appendChild(itemWrap);
   }
 
   el('modalRiderLabel').textContent = txt.riderNameLabel;
@@ -549,13 +722,13 @@ function renderBikeModal() {
   riderInput.value = state.modal.riderName;
 
   el('modalTotalLabel').textContent = txt.modalTotal;
-  const modalTotal = getItemTotal({
+  const total = getItemTotal({
     bikeId: bike.id,
     sizeCode: state.modal.sizeCode,
     pedalId: state.modal.pedalId,
     extraIds: [...state.modal.extraIds],
   });
-  el('modalLiveTotal').textContent = fmtEuro(modalTotal);
+  el('modalLiveTotal').textContent = fmtEuro(total);
 
   const addBtn = el('modalAddBtn');
   addBtn.textContent = txt.modalAdd;
@@ -578,22 +751,22 @@ function addModalBikeToBag() {
     riderName: el('riderNameInput').value.trim(),
   });
 
-  closeModal('bikeModalBackdrop');
-  renderAll();
-  showToast(t().toastAdded(bike.name, szObj.label));
+  closeOverlay('bikeBackdrop', () => {
+    renderBikeGrid();
+    syncBagIndicators();
+  });
 }
 
-/* ---------------- Bag Drawer & Checkout Preview ---------------- */
-
 function openBagDrawer(triggerEl) {
-  el('toast').hidden = true;
-  clearTimeout(state.toastTimer);
   state.lastTriggerEl = triggerEl || document.activeElement;
   if (state.drawerMode === 'confirmed' && state.bag.length === 0) {
     state.drawerMode = 'bag';
   }
   renderBagDrawer();
-  el('bagBackdrop').hidden = false;
+  const backdrop = el('bagBackdrop');
+  backdrop.classList.remove('is-closing');
+  backdrop.hidden = false;
+  syncBagIndicators();
   el('closeBagDrawer').focus();
 }
 
@@ -603,72 +776,70 @@ function renderBagDrawer() {
   body.replaceChildren();
 
   const ret = computeReturnInfo(state.pickupDate, state.pickupTime, state.durationKey, state.customDays);
-  const sched = document.createElement('div');
-  sched.className = 'bag-schedule-card';
-  const r1 = document.createElement('div');
-  r1.innerHTML = '';
-  r1.textContent = `${txt.bagPickup}: ${state.pickupDate} · ${state.pickupTime}`;
-  const r2 = document.createElement('div');
-  r2.textContent = `${txt.bagReturn}: ${ret.dateStr} · ${ret.timeStr}`;
-  sched.append(r1, r2);
-  body.appendChild(sched);
+  const win = document.createElement('div');
+  win.className = 'bag-window';
+  const wLeft = document.createElement('div');
+  wLeft.innerHTML = '';
+  wLeft.textContent = `${txt.bagPickup}: ${state.pickupDate} · ${state.pickupTime}`;
+  const wRight = document.createElement('div');
+  wRight.textContent = `${txt.bagReturn}: ${ret.dateStr} · ${ret.timeStr}`;
+  win.append(wLeft, wRight);
+  body.appendChild(win);
 
   if (state.drawerMode === 'confirmed' && state.demoCustomer) {
     const gross = state.bag.reduce((sum, item) => sum + getItemTotal(item), 0);
-    const card = document.createElement('div');
-    card.className = 'demo-confirm-card';
+    const box = document.createElement('div');
+    box.className = 'confirmed-box';
 
-    const badge = document.createElement('span');
-    badge.className = 'demo-pill';
-    badge.textContent = txt.demoConfirmBadge;
+    const tag = document.createElement('span');
+    tag.className = 'confirmed-tag';
+    tag.textContent = txt.confirmedBadge;
 
     const h3 = document.createElement('h3');
     h3.style.margin = '0';
-    h3.textContent = txt.demoConfirmTitle;
+    h3.textContent = txt.confirmedTitle;
 
-    const who = document.createElement('div');
-    who.style.fontSize = '13.5px';
-    who.textContent = `${state.demoCustomer.firstName} ${state.demoCustomer.lastName} · ${state.demoCustomer.email} · ${state.bag.length} bike(s) · ${fmtEuro(gross)}`;
+    const meta = document.createElement('div');
+    meta.style.fontSize = '13.5px';
+    meta.textContent = `${state.demoCustomer.firstName} ${state.demoCustomer.lastName} · ${state.demoCustomer.email} · ${fmtEuro(gross)}`;
 
-    const desc = document.createElement('p');
-    desc.style.margin = '0';
-    desc.style.fontSize = '13px';
-    desc.textContent = txt.demoConfirmDesc;
+    const msg = document.createElement('p');
+    msg.style.margin = '0';
+    msg.style.fontSize = '13.5px';
+    msg.textContent = txt.confirmedBody;
 
     const firstBike = BIKES.find((b) => b.id === state.bag[0]?.bikeId);
-    const liveA = document.createElement('a');
-    liveA.className = 'btn-primary';
-    liveA.style.textAlign = 'center';
-    liveA.style.textDecoration = 'none';
-    liveA.href = buildBrmDeepLink(firstBike?.brmCategoryId, state.lang);
-    liveA.target = '_blank';
-    liveA.rel = 'noopener noreferrer';
-    liveA.textContent = txt.handoffBtn;
+    const payLink = document.createElement('a');
+    payLink.className = 'btn-yellow';
+    payLink.href = buildBrmDeepLink(firstBike?.brmCategoryId, state.lang);
+    payLink.target = '_blank';
+    payLink.rel = 'noopener noreferrer';
+    payLink.textContent = txt.handoffBtn;
 
-    const resetBtn = document.createElement('button');
-    resetBtn.type = 'button';
-    resetBtn.className = 'btn-secondary';
-    resetBtn.textContent = txt.startOverBtn;
-    resetBtn.addEventListener('click', () => {
+    const editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.className = 'btn-ghost';
+    editBtn.textContent = txt.editBagBtn;
+    editBtn.addEventListener('click', () => {
       state.drawerMode = 'bag';
       renderBagDrawer();
     });
 
-    card.append(badge, h3, who, desc, liveA, resetBtn);
-    body.appendChild(card);
+    box.append(tag, h3, meta, msg, payLink, editBtn);
+    body.appendChild(box);
     return;
   }
 
   if (state.bag.length === 0) {
     const empty = document.createElement('p');
-    empty.style.color = 'var(--ink-muted)';
+    empty.style.color = 'var(--muted)';
     empty.textContent = txt.bagEmpty;
     body.appendChild(empty);
     return;
   }
 
-  const itemsWrap = document.createElement('div');
-  itemsWrap.className = 'bag-items';
+  const list = document.createElement('div');
+  list.className = 'bag-list';
 
   let grossTotal = 0;
   for (const item of state.bag) {
@@ -688,112 +859,110 @@ function renderBagDrawer() {
       })
       .filter(Boolean);
 
-    const card = document.createElement('div');
-    card.className = 'bag-item';
+    const row = document.createElement('div');
+    row.className = 'bag-line-item';
 
-    const head = document.createElement('div');
-    head.className = 'bag-item-head';
-    const title = document.createElement('span');
-    title.className = 'bag-item-title';
-    title.textContent = `${bike.name} · ${item.sizeCode}${item.riderName ? ` — ${item.riderName}` : ''}`;
-    const priceEl = document.createElement('strong');
+    const top = document.createElement('div');
+    top.className = 'bag-line-top';
+    const nameEl = document.createElement('span');
+    nameEl.textContent = `${bike.name} · ${item.sizeCode}${item.riderName ? ` — ${item.riderName}` : ''}`;
+    const priceEl = document.createElement('span');
     priceEl.textContent = fmtEuro(itemPrice);
-    head.append(title, priceEl);
+    top.append(nameEl, priceEl);
 
     const meta = document.createElement('div');
-    meta.className = 'bag-item-meta';
-    const parts = [pedalObj ? pedalObj.label[state.lang] : null, ...extraNames].filter(Boolean);
-    meta.textContent = parts.join(' · ');
+    meta.className = 'bag-line-meta';
+    meta.textContent = [pedalObj?.label[state.lang], ...extraNames].filter(Boolean).join(' · ');
 
-    const actRow = document.createElement('div');
-    actRow.className = 'bag-item-actions';
     const remBtn = document.createElement('button');
     remBtn.type = 'button';
-    remBtn.className = 'remove-btn';
+    remBtn.className = 'bag-remove';
     remBtn.textContent = txt.bagRemove;
     remBtn.addEventListener('click', () => {
       state.bag = state.bag.filter((x) => x.uid !== item.uid);
       if (state.bag.length === 0) state.drawerMode = 'bag';
-      renderAll();
+      renderBikeGrid();
+      syncBagIndicators();
       renderBagDrawer();
     });
-    actRow.appendChild(remBtn);
 
-    card.append(head, meta, actRow);
-    itemsWrap.appendChild(card);
+    row.append(top, meta, remBtn);
+    list.appendChild(row);
   }
-  body.appendChild(itemsWrap);
+  body.appendChild(list);
 
   const vat = computeVatBreakdown(grossTotal);
-  const sumBox = document.createElement('div');
-  sumBox.className = 'bag-summary';
-  const totalRow = document.createElement('div');
-  totalRow.className = 'bag-total-row';
-  const lbl = document.createElement('span');
-  lbl.textContent = 'Total';
-  const val = document.createElement('span');
-  val.textContent = fmtEuro(vat.gross);
-  totalRow.append(lbl, val);
+  const totals = document.createElement('div');
+  totals.className = 'bag-totals';
+  const grandRow = document.createElement('div');
+  grandRow.className = 'bag-grand';
+  const gl = document.createElement('span');
+  gl.textContent = 'Total';
+  const gv = document.createElement('span');
+  gv.textContent = fmtEuro(vat.gross);
+  grandRow.append(gl, gv);
 
-  const vatLine = document.createElement('p');
-  vatLine.className = 'bag-vat-line';
-  vatLine.textContent = txt.bagVatLine(vat.vat, vat.net);
+  const vatP = document.createElement('p');
+  vatP.className = 'bag-note';
+  vatP.textContent = txt.bagVat(vat.vat, vat.net);
 
-  const idNote = document.createElement('p');
-  idNote.className = 'bag-id-note';
-  idNote.textContent = txt.bagIdNote;
+  const idP = document.createElement('p');
+  idP.className = 'bag-note';
+  idP.textContent = txt.bagIdNote;
 
-  sumBox.append(totalRow, vatLine, idNote);
-  body.appendChild(sumBox);
+  totals.append(grandRow, vatP, idP);
+  body.appendChild(totals);
 
   if (state.drawerMode === 'checkout') {
     const form = document.createElement('form');
-    form.className = 'checkout-form';
-    form.innerHTML = '';
+    form.className = 'guest-form';
 
-    const mkField = (id, labelTxt, type, req) => {
-      const w = document.createElement('div');
-      w.className = 'checkout-field';
+    const mkInput = (id, labelTxt, type, req) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'guest-field';
       const l = document.createElement('label');
       l.setAttribute('for', id);
       l.textContent = labelTxt;
       const inp = document.createElement('input');
       inp.id = id;
       inp.type = type;
+      inp.className = 'text-input';
       inp.required = req;
-      w.append(l, inp);
-      return w;
+      wrap.append(l, inp);
+      return wrap;
     };
 
-    const fn = mkField('coFirst', txt.firstName, 'text', true);
-    const ln = mkField('coLast', txt.lastName, 'text', true);
-    const em = mkField('coEmail', txt.email, 'email', true);
-    const ph = mkField('coPhone', txt.phone, 'tel', false);
+    const pair = document.createElement('div');
+    pair.className = 'field-pair';
+    pair.append(mkInput('coFirst', txt.firstName, 'text', true), mkInput('coLast', txt.lastName, 'text', true));
+
+    const em = mkInput('coEmail', txt.email, 'email', true);
+    const ph = mkInput('coPhone', txt.phone, 'tel', false);
 
     const termsWrap = document.createElement('label');
-    termsWrap.className = 'terms-row';
-    const termsCb = document.createElement('input');
-    termsCb.type = 'checkbox';
-    termsCb.required = true;
-    const termsSpan = document.createElement('span');
-    termsSpan.textContent = txt.terms;
-    termsWrap.append(termsCb, termsSpan);
+    termsWrap.className = 'terms-check';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.required = true;
+    const span = document.createElement('span');
+    span.textContent = txt.terms;
+    termsWrap.append(cb, span);
 
     const subBtn = document.createElement('button');
     subBtn.type = 'submit';
-    subBtn.className = 'btn-primary';
-    subBtn.textContent = txt.submitDemoBtn;
+    subBtn.className = 'btn-yellow';
+    subBtn.textContent = txt.confirmBtn;
 
     const backBtn = document.createElement('button');
     backBtn.type = 'button';
-    backBtn.className = 'btn-secondary';
+    backBtn.className = 'btn-ghost';
     backBtn.textContent = txt.backToBagBtn;
     backBtn.addEventListener('click', () => {
       state.drawerMode = 'bag';
       renderBagDrawer();
     });
 
-    form.append(fn, ln, em, ph, termsWrap, subBtn, backBtn);
+    form.append(pair, em, ph, termsWrap, subBtn, backBtn);
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       state.demoCustomer = {
@@ -809,182 +978,123 @@ function renderBagDrawer() {
     return;
   }
 
-  const actions = document.createElement('div');
-  actions.className = 'bag-actions';
+  const stack = document.createElement('div');
+  stack.className = 'bag-cta-stack';
 
   const firstBike = BIKES.find((b) => b.id === state.bag[0]?.bikeId);
-  const handoffLink = document.createElement('a');
-  handoffLink.className = 'btn-primary';
-  handoffLink.style.textAlign = 'center';
-  handoffLink.style.textDecoration = 'none';
-  handoffLink.href = buildBrmDeepLink(firstBike?.brmCategoryId, state.lang);
-  handoffLink.target = '_blank';
-  handoffLink.rel = 'noopener noreferrer';
-  handoffLink.textContent = txt.handoffBtn;
+  const payLink = document.createElement('a');
+  payLink.className = 'btn-yellow';
+  payLink.href = buildBrmDeepLink(firstBike?.brmCategoryId, state.lang);
+  payLink.target = '_blank';
+  payLink.rel = 'noopener noreferrer';
+  payLink.textContent = txt.handoffBtn;
 
-  const hint = document.createElement('p');
-  hint.className = 'handoff-hint';
-  hint.textContent = txt.handoffHint;
-
-  const previewBtn = document.createElement('button');
-  previewBtn.type = 'button';
-  previewBtn.className = 'btn-secondary';
-  previewBtn.textContent = txt.previewCheckoutBtn;
-  previewBtn.addEventListener('click', () => {
+  const guestBtn = document.createElement('button');
+  guestBtn.type = 'button';
+  guestBtn.className = 'btn-ghost';
+  guestBtn.textContent = txt.guestBtn;
+  guestBtn.addEventListener('click', () => {
     state.drawerMode = 'checkout';
     renderBagDrawer();
   });
 
-  actions.append(handoffLink, hint, previewBtn);
-  body.appendChild(actions);
+  stack.append(payLink, guestBtn);
+  body.appendChild(stack);
 }
 
-/* ---------------- Fixes Comparison Modal ---------------- */
+function closeOverlay(backdropId, afterClose) {
+  const backdrop = el(backdropId);
+  if (backdrop.hidden) return;
 
-function renderCompareModal() {
-  const txt = t();
-  const body = el('compareBody');
-  body.replaceChildren();
+  const finish = () => {
+    backdrop.classList.remove('is-closing');
+    backdrop.hidden = true;
+    syncBagIndicators();
+    if (state.lastTriggerEl && typeof state.lastTriggerEl.focus === 'function') {
+      state.lastTriggerEl.focus();
+    }
+    state.lastTriggerEl = null;
+    if (afterClose) afterClose();
+  };
 
-  const list = document.createElement('div');
-  list.className = 'compare-list';
-  for (const fx of FIXES) {
-    const card = document.createElement('article');
-    card.className = 'compare-card';
-
-    const h3 = document.createElement('h3');
-    h3.textContent = fx.area[state.lang];
-
-    const cols = document.createElement('div');
-    cols.className = 'compare-cols';
-
-    const bef = document.createElement('div');
-    bef.className = 'compare-before';
-    const bTag = document.createElement('span');
-    bTag.className = 'compare-col-tag';
-    bTag.textContent = txt.compareBefore;
-    const bTxt = document.createElement('div');
-    bTxt.textContent = fx.before[state.lang];
-    bef.append(bTag, bTxt);
-
-    const aft = document.createElement('div');
-    aft.className = 'compare-after';
-    const aTag = document.createElement('span');
-    aTag.className = 'compare-col-tag';
-    aTag.textContent = txt.compareAfter;
-    const aTxt = document.createElement('div');
-    aTxt.textContent = fx.after[state.lang];
-    aft.append(aTag, aTxt);
-
-    cols.append(bef, aft);
-    card.append(h3, cols);
-    list.appendChild(card);
+  if (prefersReducedMotion()) {
+    finish();
+    return;
   }
-  body.appendChild(list);
+  backdrop.classList.add('is-closing');
+  setTimeout(finish, 185);
 }
 
-function openCompareModal(triggerEl) {
-  state.lastTriggerEl = triggerEl || document.activeElement;
-  renderCompareModal();
-  el('compareBackdrop').hidden = false;
-  el('closeCompareModal').focus();
-}
-
-/* ---------------- Shared Helpers & Events ---------------- */
-
-function closeModal(backdropId) {
-  el(backdropId).hidden = true;
-  if (state.lastTriggerEl && typeof state.lastTriggerEl.focus === 'function') {
-    state.lastTriggerEl.focus();
-  }
-  state.lastTriggerEl = null;
-}
-
-function showToast(msg) {
-  el('toastText').textContent = msg;
-  el('toast').hidden = false;
-  clearTimeout(state.toastTimer);
-  state.toastTimer = setTimeout(() => {
-    el('toast').hidden = true;
-  }, 4500);
+function setupScrollChrome() {
+  const hero = el('hero');
+  const nav = el('siteNav');
+  const heroObserver = new IntersectionObserver(
+    (entries) => {
+      const heroVisible = entries[0]?.isIntersecting ?? true;
+      nav.classList.toggle('is-scrolled', !heroVisible);
+      syncGlidingSegThumb(el('langSeg'), state.lang);
+    },
+    { threshold: 0.14 }
+  );
+  heroObserver.observe(hero);
 }
 
 function renderAll() {
   syncStaticLabels();
-  syncScheduleControls();
+  renderStorySection();
+  syncDeckControls();
   renderBikeGrid();
-  updateHeaderBag();
+  syncBagIndicators();
 }
 
 function bindEvents() {
-  for (const btn of document.querySelectorAll('.lang-btn')) {
-    btn.addEventListener('click', () => {
-      state.lang = btn.dataset.lang;
-      el('toast').hidden = true;
-      clearTimeout(state.toastTimer);
-      renderAll();
-      if (!el('bikeModalBackdrop').hidden) renderBikeModal();
-      if (!el('bagBackdrop').hidden) renderBagDrawer();
-      if (!el('compareBackdrop').hidden) renderCompareModal();
-    });
-  }
+  segResizeObserver.observe(el('langSeg'));
+  segResizeObserver.observe(el('durationSeg'));
+  segResizeObserver.observe(el('categorySeg'));
+  segResizeObserver.observe(el('heightSeg'));
+
+  el('pickupDate').addEventListener('change', (e) => {
+    state.pickupDate = e.target.value || parisDateOffset(1);
+    syncDeckControls();
+    syncBagIndicators();
+  });
+
+  el('pickupTime').addEventListener('change', (e) => {
+    state.pickupTime = e.target.value;
+    syncDeckControls();
+  });
+
+  el('customDaysInput').addEventListener('input', (e) => {
+    state.customDays = Math.max(1, Math.min(30, Number(e.target.value) || 1));
+    state.rollPrices = true;
+    syncDeckControls();
+    renderBikeGrid();
+    syncBagIndicators();
+  });
 
   el('riderNameInput').addEventListener('input', (e) => {
     state.modal.riderName = e.target.value;
   });
 
-  el('pickupDate').addEventListener('change', (e) => {
-    state.pickupDate = e.target.value || parisDateOffset(1);
-    renderAll();
-  });
-
-  el('pickupTime').addEventListener('change', (e) => {
-    state.pickupTime = e.target.value;
-    syncScheduleControls();
-  });
-
-  el('durationSelect').addEventListener('change', (e) => {
-    state.durationKey = e.target.value;
-    renderAll();
-  });
-
-  el('customDaysInput').addEventListener('input', (e) => {
-    const val = Math.max(1, Math.min(30, Number(e.target.value) || 1));
-    state.customDays = val;
-    renderAll();
-  });
-
-  el('heightFilter').addEventListener('change', (e) => {
-    state.heightFilter = e.target.value;
-    renderAll();
-  });
-
-  el('bagTrigger').addEventListener('click', (e) => openBagDrawer(e.currentTarget));
-  el('toastViewBagBtn').addEventListener('click', (e) => {
-    el('toast').hidden = true;
-    openBagDrawer(e.currentTarget);
-  });
-
-  el('openCompareBtn').addEventListener('click', (e) => openCompareModal(e.currentTarget));
+  el('navBagBtn').addEventListener('click', (e) => openBagDrawer(e.currentTarget));
+  el('bagDock').addEventListener('click', (e) => openBagDrawer(e.currentTarget));
   el('modalAddBtn').addEventListener('click', addModalBikeToBag);
+  el('closeBikeModal').addEventListener('click', () => closeOverlay('bikeBackdrop'));
+  el('closeBagDrawer').addEventListener('click', () => closeOverlay('bagBackdrop'));
 
-  el('closeBikeModal').addEventListener('click', () => closeModal('bikeModalBackdrop'));
-  el('closeBagDrawer').addEventListener('click', () => closeModal('bagBackdrop'));
-  el('closeCompareModal').addEventListener('click', () => closeModal('compareBackdrop'));
-
-  for (const id of ['bikeModalBackdrop', 'bagBackdrop', 'compareBackdrop']) {
+  for (const id of ['bikeBackdrop', 'bagBackdrop']) {
     el(id).addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) closeModal(id);
+      if (e.target === e.currentTarget) closeOverlay(id);
     });
   }
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (!el('bikeModalBackdrop').hidden) closeModal('bikeModalBackdrop');
-    else if (!el('bagBackdrop').hidden) closeModal('bagBackdrop');
-    else if (!el('compareBackdrop').hidden) closeModal('compareBackdrop');
+    if (!el('bikeBackdrop').hidden) closeOverlay('bikeBackdrop');
+    else if (!el('bagBackdrop').hidden) closeOverlay('bagBackdrop');
   });
 }
 
+setupScrollChrome();
 bindEvents();
 renderAll();
