@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le Peloton Café — Paris Bike Rental</title>
+  <meta name="description" content="Rent carbon road, gravel, city and family bikes directly from Le Peloton Café in the Marais, Paris. Instant pricing, real frame sizes, and per-bike pedal setup.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Le Peloton Café Bike Rental">
+        <span class="brand-crest">
+          <img
+            src="https://storage.googleapis.com/brm-cdn/store/lepelotoncafe/shop-logo-orig.png?v=1794838440381"
+            alt="Le Peloton Café"
+            referrerpolicy="no-referrer"
+            width="92"
+            height="34"
+          >
+        </span>
+        <span class="brand-meta" id="brandSub">Marais, Paris · Bike Rental</span>
+      </a>
+
+      <div class="header-actions">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" class="lang-btn" data-lang="en" aria-pressed="true">EN</button>
+          <button type="button" class="lang-btn" data-lang="fr" aria-pressed="false">FR</button>
+        </div>
+        <button type="button" class="bag-trigger" id="bagTrigger" aria-label="Open rental bag">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M6 7h12l1 13H5L6 7z"></path>
+            <path d="M9 7V5a3 3 0 0 1 6 0v2"></path>
+          </svg>
+          <span id="bagBtnLabel">Bag</span>
+          <span class="bag-badge" id="bagCount">0</span>
+          <span class="bag-total" id="bagHeaderTotal" hidden>€0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="container main-content">
+    <section class="booking-header" aria-labelledby="heroTitle">
+      <div class="hero-copy">
+        <h1 id="heroTitle">Bike rentals from Le Peloton Café</h1>
+        <p id="heroSub" class="hero-sub">17 Rue du Pont Louis Philippe · Helmet &amp; kit included · 20% VAT incl.</p>
+      </div>
+
+      <form class="booking-bar" id="bookingBar" onsubmit="return false" aria-label="Rental schedule and rider fit filters">
+        <div class="field-group">
+          <label for="pickupDate" id="lblPickupDate">Pickup date</label>
+          <input type="date" id="pickupDate" required>
+        </div>
+
+        <div class="field-group">
+          <label for="pickupTime" id="lblPickupTime">Pickup time</label>
+          <select id="pickupTime"></select>
+        </div>
+
+        <div class="field-group field-duration">
+          <label for="durationSelect" id="lblDuration">Duration</label>
+          <div class="duration-controls">
+            <select id="durationSelect"></select>
+            <div class="custom-days-wrap" id="customDaysWrap" hidden>
+              <input type="number" id="customDaysInput" min="1" max="30" value="4" aria-label="Custom rental days">
+              <span id="lblDaysUnit">days</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="heightFilter" id="lblRiderHeight">Rider height</label>
+          <select id="heightFilter"></select>
+        </div>
+
+        <div class="return-pill" aria-live="polite">
+          <span class="return-label" id="lblReturnPreview">Return:</span>
+          <strong id="returnValue">—</strong>
+        </div>
+      </form>
+    </section>
+
+    <nav class="category-bar" aria-label="Bike categories">
+      <div class="category-pills" id="categoryPills"></div>
+      <p class="fleet-count" id="fleetCount" aria-live="polite"></p>
+    </nav>
+
+    <section class="bike-grid" id="bikeGrid" aria-label="Available bikes"></section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-info">
+        <strong>Le Peloton Café</strong> · 17 Rue du Pont Louis Philippe, 75004 Paris ·
+        <span id="footerHours">Open daily for pickups: Mon–Fri 08:00–16:00 · Sat–Sun 08:00–17:30</span>
+      </div>
+      <div class="footer-links">
+        <button type="button" class="link-btn" id="openCompareBtn">What we fixed vs current BRM (10 improvements)</button>
+        <a class="footer-ext" id="footerBrmLink" href="https://app.booking.bike.rent/book?store=lepelotoncafe&offering=rental" target="_blank" rel="noopener noreferrer">Live BRM site</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bike Configurator Modal -->
+  <div class="backdrop" id="bikeModalBackdrop" hidden>
+    <div class="modal" id="bikeModal" role="dialog" aria-modal="true" aria-labelledby="modalBikeTitle">
+      <div class="modal-header">
+        <div>
+          <h2 id="modalBikeTitle"></h2>
+          <p class="modal-subtitle" id="modalBikeTagline"></p>
+        </div>
+        <button type="button" class="icon-close" id="closeBikeModal" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-hero-row">
+          <div class="modal-photo-wrap">
+            <img id="modalBikeImg" alt="" referrerpolicy="no-referrer">
+          </div>
+          <div class="modal-desc-col">
+            <p id="modalBikeDesc"></p>
+            <h3 id="modalSpecsTitle">Included &amp; specs</h3>
+            <ul class="spec-list" id="modalSpecList"></ul>
+          </div>
+        </div>
+
+        <form id="bikeConfigForm" onsubmit="return false">
+          <div class="config-section">
+            <div class="section-head">
+              <label id="modalSizeLabel">Frame size</label>
+              <span class="size-guide-hint" id="modalSizeHint"></span>
+            </div>
+            <div class="size-radio-grid" id="modalSizeOptions" role="radiogroup" aria-labelledby="modalSizeLabel"></div>
+          </div>
+
+          <div class="config-section" id="modalPedalsSection">
+            <label id="modalPedalsLabel">Pedal setup (this bike only)</label>
+            <div class="pedal-grid" id="modalPedalOptions" role="radiogroup" aria-labelledby="modalPedalsLabel"></div>
+            <p class="city-pedal-note" id="modalCityPedalNote" hidden></p>
+          </div>
+
+          <div class="config-section" id="modalExtrasSection">
+            <label id="modalExtrasLabel">Optional accessories</label>
+            <div class="extras-list" id="modalExtrasList"></div>
+          </div>
+
+          <div class="config-section">
+            <label for="riderNameInput" id="modalRiderLabel">Rider label (optional — great for groups)</label>
+            <input type="text" id="riderNameInput" maxlength="40" placeholder="e.g. Alex or Rider 1">
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-price-box">
+          <span class="muted-label" id="modalTotalLabel">Bike total</span>
+          <strong class="modal-price" id="modalLiveTotal">€0</strong>
+        </div>
+        <button type="button" class="btn-primary" id="modalAddBtn">Add bike to bag</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rental Bag & Fast Guest Checkout Drawer -->
+  <div class="backdrop backdrop-drawer" id="bagBackdrop" hidden>
+    <aside class="drawer" id="bagDrawer" role="dialog" aria-modal="true" aria-labelledby="bagDrawerTitle">
+      <div class="drawer-header">
+        <h2 id="bagDrawerTitle">Your rental bag</h2>
+        <button type="button" class="icon-close" id="closeBagDrawer" aria-label="Close">✕</button>
+      </div>
+
+      <div class="drawer-body" id="bagDrawerBody"></div>
+    </aside>
+  </div>
+
+  <!-- 10 Fixes Comparison Modal -->
+  <div class="backdrop" id="compareBackdrop" hidden>
+    <div class="modal modal-wide" id="compareModal" role="dialog" aria-modal="true" aria-labelledby="compareTitle">
+      <div class="modal-header">
+        <h2 id="compareTitle">10 Fixes vs Current BRM Site</h2>
+        <button type="button" class="icon-close" id="closeCompareModal" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body" id="compareBody"></div>
+    </div>
+  </div>
+
+  <!-- Confirmation Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+    <span id="toastText"></span>
+    <button type="button" class="toast-action" id="toastViewBagBtn">View bag</button>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
