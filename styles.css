@@ -1524,6 +1524,811 @@ select {
   font-weight: 700;
 }
 
+.checkout-error {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--red-soft);
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.section-eyebrow {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.band-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px 28px;
+  margin-bottom: 28px;
+}
+
+.band-meta-dark {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ink-light-muted);
+}
+
+.tours-band {
+  background: var(--obsidian);
+  color: var(--ink-light);
+  padding: 88px 0 96px;
+}
+
+.tour-date-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tour-date-bar label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-light-muted);
+}
+
+.tour-date-bar input {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line-dark);
+  background: var(--obsidian-soft);
+  color: var(--ink-light);
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color-scheme: dark;
+}
+
+.tours-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.tour-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--obsidian-soft);
+  border: 1px solid var(--line-dark);
+  border-radius: 22px;
+  overflow: hidden;
+  transition: border-color 240ms var(--ease-out), transform 240ms var(--ease-out);
+}
+
+.tour-card:hover {
+  border-color: rgba(244, 200, 38, 0.42);
+}
+
+.tour-media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #090B0E;
+}
+
+.tour-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 460ms var(--ease-out);
+}
+
+.tour-card:hover .tour-media img {
+  transform: scale(1.035);
+}
+
+.tour-dur-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(14, 17, 20, 0.78);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(247, 245, 240, 0.16);
+  color: var(--ink-light);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tour-body {
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.tour-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.16;
+}
+
+.tour-inc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--yellow);
+  font-weight: 500;
+}
+
+.tour-period {
+  color: var(--ink-light-muted);
+}
+
+.tour-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-light-muted);
+}
+
+.tour-controls {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-dark);
+  display: grid;
+  gap: 12px;
+}
+
+.tour-slot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.tour-slot-btn {
+  background: rgba(247, 245, 240, 0.07);
+  border-color: var(--line-dark);
+  color: var(--ink-light);
+}
+
+.tour-slot-btn:hover:not(:disabled) {
+  border-color: var(--yellow);
+}
+
+.tour-slot-btn.is-selected {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: var(--ink);
+}
+
+.tour-card .stock-caption {
+  color: #5CE0A0;
+}
+
+.tour-card .stock-caption.is-empty {
+  color: #FF8585;
+}
+
+.tour-steppers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.stepper-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex: 1;
+  min-width: 145px;
+  padding: 7px 11px;
+  border-radius: 11px;
+  background: rgba(247, 245, 240, 0.05);
+  border: 1px solid var(--line-dark);
+}
+
+.stepper-lbl {
+  font-size: 12.5px;
+  color: var(--ink-light-muted);
+  font-weight: 600;
+}
+
+.stepper-ctrls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stepper-ctrls button {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid var(--line-dark);
+  background: rgba(247, 245, 240, 0.08);
+  color: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepper-ctrls button:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
+}
+
+.tour-add-btn {
+  width: 100%;
+}
+
+.club-band {
+  background: var(--canvas);
+  padding: 88px 0 96px;
+}
+
+.club-deck {
+  background: var(--paper);
+  border-radius: 22px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 24px;
+}
+
+.club-deck-top {
+  display: grid;
+  grid-template-columns: 165px 1fr 240px;
+  gap: 16px;
+  align-items: end;
+}
+
+.club-upcoming-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.club-date-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.club-feedback {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.club-feedback.is-error {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.club-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.club-card {
+  background: var(--paper);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.club-pace-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.pace-pill {
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pace-pill.is-spicy {
+  background: rgba(196, 43, 43, 0.11);
+  color: #A82020;
+}
+
+.pace-pill.is-medium {
+  background: #FFF3C4;
+  color: #6B5000;
+}
+
+.pace-pill.is-mild {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.club-time {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.club-leaders-box {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+}
+
+.club-leader-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.leader-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 28px;
+  align-items: center;
+}
+
+.leader-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--stone);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.leader-empty {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.club-card-actions {
+  margin-top: auto;
+  display: grid;
+  gap: 10px;
+}
+
+.club-card-actions .btn-yellow,
+.club-card-actions .btn-ghost {
+  width: 100%;
+}
+
+.club-rent-link {
+  border: 0;
+  background: transparent;
+  padding: 4px 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.club-rent-link:hover {
+  color: var(--ink);
+}
+
+.cafe-band {
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  padding: 88px 0 96px;
+}
+
+.cafe-studio-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 44px;
+  align-items: start;
+}
+
+.ledger-head h3,
+.studio-body h3 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.ledger-roasters,
+.studio-loc {
+  margin: 0 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.ledger-subhead {
+  margin: 22px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ledger-list {
+  margin: 0;
+}
+
+.ledger-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14.5px;
+}
+
+.ledger-row dt {
+  font-weight: 500;
+}
+
+.ledger-row dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ledger-note {
+  margin: 14px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.studio-panel {
+  background: var(--canvas);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.studio-photo-wrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.studio-photo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.studio-badges {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.studio-badges span {
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(14, 17, 20, 0.8);
+  backdrop-filter: blur(10px);
+  color: var(--ink-light);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.studio-body {
+  padding: 24px 26px 28px;
+}
+
+.studio-features {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14px;
+  color: var(--muted);
+  display: grid;
+  gap: 5px;
+}
+
+.studio-form-title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.studio-form {
+  display: grid;
+  gap: 12px;
+}
+
+.studio-form .field-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.studio-form .text-input,
+.text-area {
+  background: var(--paper);
+}
+
+.text-area {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.studio-sent {
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-gate-body {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--obsidian);
+}
+
+.admin-gate-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--paper);
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+}
+
+.admin-gate-card h1 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 28px;
+}
+
+.admin-gate-sub {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.admin-body {
+  background: var(--canvas);
+  min-height: 100svh;
+}
+
+.admin-top {
+  background: var(--obsidian);
+  color: var(--ink-light);
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.admin-top-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.admin-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-status-pill {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(92, 224, 160, 0.14);
+  color: #5CE0A0;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.admin-main {
+  padding-top: 28px;
+  padding-bottom: 64px;
+}
+
+.admin-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.admin-kpi-card {
+  background: var(--paper);
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-kpi-card span {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.admin-kpi-card strong {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.05;
+}
+
+.admin-tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-refresh-btn {
+  min-height: 38px;
+  padding: 0 16px;
+}
+
+.admin-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-row-card {
+  background: var(--paper);
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.admin-row-card.is-dimmed {
+  opacity: 0.48;
+}
+
+.admin-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-ref {
+  display: block;
+  font-size: 15px;
+}
+
+.admin-sub {
+  display: block;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-head-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-pill {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-pill.is-confirmed {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.status-pill.is-pending_payment {
+  background: #FFF3C4;
+  color: #6B5000;
+}
+
+.status-pill.is-cancelled {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.admin-prep-items {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  font-size: 13.5px;
+  display: grid;
+  gap: 4px;
+}
+
+.workshop-size-list {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.workshop-size-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--canvas);
+}
+
+.workshop-size-row .stepper-ctrls button {
+  border-color: var(--line);
+  background: var(--paper);
+}
+
+.admin-inline-edit {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
 @keyframes heroSettle {
   from {
     transform: scale(1.045);
@@ -1594,9 +2399,20 @@ select {
 
 @media (max-width: 980px) {
   .story-grid,
-  .clubhouse-grid {
+  .clubhouse-grid,
+  .cafe-studio-grid,
+  .club-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 28px;
+  }
+  .club-deck-top {
+    grid-template-columns: 1fr 1fr;
+  }
+  .club-leader-field {
+    grid-column: span 2;
+  }
+  .admin-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .story-stage-col {
     position: relative;
@@ -1627,8 +2443,16 @@ select {
     min-height: 86svh;
     padding: 96px 0 46px;
   }
-  .fleet-grid {
+  .fleet-grid,
+  .tours-grid,
+  .club-deck-top,
+  .studio-form .field-pair,
+  .admin-kpis,
+  .admin-inline-edit {
     grid-template-columns: 1fr;
+  }
+  .club-leader-field {
+    grid-column: span 1;
   }
   .deck-filters {
     flex-direction: column;

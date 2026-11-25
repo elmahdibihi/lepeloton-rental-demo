@@ -1,0 +1,2511 @@
+{
+  "leaders": [
+    "Ajax",
+    "Antoine",
+    "Anya",
+    "Ashish",
+    "Chelsea",
+    "Christian",
+    "Ewan",
+    "Ferdinand",
+    "Flo",
+    "Gabe",
+    "Galen",
+    "George",
+    "Greg",
+    "Louis",
+    "Mahdi",
+    "Paul",
+    "Riley",
+    "Sonia",
+    "Tess",
+    "Vik"
+  ],
+  "rides": [
+    {
+      "ride_date": "2026-07-02",
+      "pace": "Spicy",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Anya",
+        "George"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "LPCC KIT PICKUP",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-02",
+      "pace": "Medium",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Galen",
+        "Greg"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "LPCC KIT PICKUP",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-02",
+      "pace": "Mild",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Ewan"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "LPCC KIT PICKUP",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-04",
+      "pace": "Spicy",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Louis",
+        "Ajax"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Afternoon: Insta360 Product Training (exact time TBC; keep off social media).",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-04",
+      "pace": "Medium",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Greg",
+        "Galen"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Afternoon: Insta360 Product Training (exact time TBC; keep off social media).",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-04",
+      "pace": "Mild",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Chelsea"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Afternoon: Insta360 Product Training (exact time TBC; keep off social media).",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-09",
+      "pace": "Spicy",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Antoine"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-09",
+      "pace": "Medium",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Greg",
+        "Ewan"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-09",
+      "pace": "Mild",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-11",
+      "pace": "Spicy",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Louis"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-11",
+      "pace": "Medium",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "E"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Ambiguous initial 'E' in source (possibly Ewan); Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-11",
+      "pace": "Mild",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Riley"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-12",
+      "pace": "Spicy",
+      "title": "Tour de France Practice Ride (Stage 21 Trial)",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [
+        "Anya",
+        "Galen",
+        "Ewan",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Trial ride for Tour de France Stage 21; meet back at café afterwards. Source listed Riley & Chelsea without pace split.",
+      "needs_review": 1,
+      "review_reason": "Source sheet listed Riley & Chelsea without assigning them to Mild/Medium/Spicy; missing start time.",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-12",
+      "pace": "Medium",
+      "title": "Tour de France Practice Ride (Stage 21 Trial)",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [
+        "Anya",
+        "Galen",
+        "Ewan",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Trial ride for Tour de France Stage 21; meet back at café afterwards. Source listed Riley & Chelsea without pace split.",
+      "needs_review": 1,
+      "review_reason": "Source sheet listed Riley & Chelsea without assigning them to Mild/Medium/Spicy; missing start time.",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-12",
+      "pace": "Mild",
+      "title": "Tour de France Practice Ride (Stage 21 Trial)",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Riley",
+        "Chelsea"
+      ],
+      "unavailable": [
+        "Anya",
+        "Galen",
+        "Ewan",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Trial ride for Tour de France Stage 21; meet back at café afterwards. Source listed Riley & Chelsea without pace split.",
+      "needs_review": 1,
+      "review_reason": "Source sheet listed Riley & Chelsea without assigning them to Mild/Medium/Spicy; missing start time.",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-16",
+      "pace": "Spicy",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Louis",
+        "Antoine"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-16",
+      "pace": "Medium",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Greg"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Tentative/conditional leader text in source: 'Greg (Tess if not work)'; Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-16",
+      "pace": "Mild",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-18",
+      "pace": "Spicy",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Antoine"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Regular Saturday ride (small chance of partnership ride).",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-18",
+      "pace": "Medium",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Vik"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Regular Saturday ride (small chance of partnership ride).",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-18",
+      "pace": "Mild",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Chelsea"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Regular Saturday ride (small chance of partnership ride).",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-19",
+      "pace": "Spicy",
+      "title": "SMARTWATCH RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Anya"
+      ],
+      "unavailable": [
+        "Louis",
+        "Galen",
+        "Ewan",
+        "Sonia",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Smartwatch Ride (moved from July 12). Confirm Apple/Android phone.",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-19",
+      "pace": "Medium",
+      "title": "SMARTWATCH RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Greg",
+        "Vik"
+      ],
+      "unavailable": [
+        "Louis",
+        "Galen",
+        "Ewan",
+        "Sonia",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Smartwatch Ride (moved from July 12). Confirm Apple/Android phone.",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-19",
+      "pace": "Mild",
+      "title": "SMARTWATCH RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Riley",
+        "Chelsea"
+      ],
+      "unavailable": [
+        "Louis",
+        "Galen",
+        "Ewan",
+        "Sonia",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Smartwatch Ride (moved from July 12). Confirm Apple/Android phone.",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-23",
+      "pace": "Spicy",
+      "title": "RIDES & STRIDES x INSTA 360",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Anya",
+        "Louis"
+      ],
+      "unavailable": [
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Rides & Strides x Insta360: free drinks & hot dogs, camera testing, Tadej Pogačar signed prize.",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-23",
+      "pace": "Medium",
+      "title": "RIDES & STRIDES x INSTA 360",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Galen",
+        "greg  Vik"
+      ],
+      "unavailable": [
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Rides & Strides x Insta360: free drinks & hot dogs, camera testing, Tadej Pogačar signed prize.",
+      "needs_review": 1,
+      "review_reason": "Tentative/conditional leader text in source: 'Galen + porbably greg also Vik if needed'; Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-23",
+      "pace": "Mild",
+      "title": "RIDES & STRIDES x INSTA 360",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Riley"
+      ],
+      "unavailable": [
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Rides & Strides x Insta360: free drinks & hot dogs, camera testing, Tadej Pogačar signed prize.",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-25",
+      "pace": "Medium",
+      "title": "Very Early Monuments Photo Ride (Montmartre)",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Anya",
+        "Louis",
+        "Galen",
+        "Ajax",
+        "Greg",
+        "Riley"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Shorter, quicker climbing ride with photographer wearing Insta360 jerseys. Source noted 'Anya if really early' and pace 'Medium +'.",
+      "needs_review": 1,
+      "review_reason": "Source had 'Medium +' pace, 'Anya if really early', and missing exact start time.",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-26",
+      "pace": "Spicy",
+      "title": "LPCC x INSTA360 x TDF",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Louis",
+        "Ajax",
+        "Antoine"
+      ],
+      "unavailable": [
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Can't be there: Vik (off to KZ until August 22)\nAFTERPARTY: Anya, Louis, Riley, Galen, Chelsea, Ewan, Ajax\nBig Tour de France Ride x Insta360 + evening afterparty.",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-26",
+      "pace": "Medium",
+      "title": "LPCC x INSTA360 x TDF",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Ewan",
+        "Greg",
+        "Sonia",
+        "Anya",
+        "Galen"
+      ],
+      "unavailable": [
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Can't be there: Vik (off to KZ until August 22)\nAFTERPARTY: Anya, Louis, Riley, Galen, Chelsea, Ewan, Ajax\nBig Tour de France Ride x Insta360 + evening afterparty.",
+      "needs_review": 1,
+      "review_reason": "Source had 'medium +' pace (mapped to Medium); Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-26",
+      "pace": "Mild",
+      "title": "LPCC x INSTA360 x TDF",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Riley",
+        "Chelsea",
+        "Ashish"
+      ],
+      "unavailable": [
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Can't be there: Vik (off to KZ until August 22)\nAFTERPARTY: Anya, Louis, Riley, Galen, Chelsea, Ewan, Ajax\nBig Tour de France Ride x Insta360 + evening afterparty.",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-30",
+      "pace": "Spicy",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Louis"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-30",
+      "pace": "Medium",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Ewan"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-07-30",
+      "pace": "Mild",
+      "title": "RIDES & STRIDES",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Riley"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-08-01",
+      "pace": "Spicy",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Louis",
+        "Ajax",
+        "Antoine"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-08-01",
+      "pace": "Medium",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Galen"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-08-01",
+      "pace": "Mild",
+      "title": "CLUB RIDE",
+      "start_time": "",
+      "status": "completed",
+      "leaders": [
+        "Riley"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-08-02",
+      "pace": "Spicy",
+      "title": "LPCC x HYPERICE (CANCELLED)",
+      "start_time": "",
+      "status": "cancelled",
+      "leaders": [
+        "Louis"
+      ],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-08-02",
+      "pace": "Medium",
+      "title": "LPCC x HYPERICE (CANCELLED)",
+      "start_time": "",
+      "status": "cancelled",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-08-02",
+      "pace": "Mild",
+      "title": "LPCC x HYPERICE (CANCELLED)",
+      "start_time": "",
+      "status": "cancelled",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 1,
+      "review_reason": "Missing start time in July sheet",
+      "source_sheet": "July '26"
+    },
+    {
+      "ride_date": "2026-08-08",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Louis",
+        "George"
+      ],
+      "unavailable": [
+        "Vik",
+        "Christian",
+        "Anya",
+        "Sonia",
+        "Riley",
+        "Greg",
+        "Tess",
+        "Ewan"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Anya's bday ride may be postponed to another time beacuse Anya does not know how to plan things\nMedium likely to be shorter and punchy this week :) -GN",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-08",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Galen"
+      ],
+      "unavailable": [
+        "Vik",
+        "Christian",
+        "Anya",
+        "Sonia",
+        "Riley",
+        "Greg",
+        "Tess",
+        "Ewan"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Anya's bday ride may be postponed to another time beacuse Anya does not know how to plan things\nMedium likely to be shorter and punchy this week :) -GN",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-08",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Chelsea"
+      ],
+      "unavailable": [
+        "Vik",
+        "Christian",
+        "Anya",
+        "Sonia",
+        "Riley",
+        "Greg",
+        "Tess",
+        "Ewan"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Anya's bday ride may be postponed to another time beacuse Anya does not know how to plan things\nMedium likely to be shorter and punchy this week :) -GN",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-15",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Antoine",
+        "Ajax"
+      ],
+      "unavailable": [
+        "Vik",
+        "Christian",
+        "Louis",
+        "Chelsea",
+        "Galen",
+        "Greg",
+        "Anya"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-15",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Tess"
+      ],
+      "unavailable": [
+        "Vik",
+        "Christian",
+        "Louis",
+        "Chelsea",
+        "Galen",
+        "Greg",
+        "Anya"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-15",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Riley"
+      ],
+      "unavailable": [
+        "Vik",
+        "Christian",
+        "Louis",
+        "Chelsea",
+        "Galen",
+        "Greg",
+        "Anya"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-22",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Antoine"
+      ],
+      "unavailable": [
+        "Vik",
+        "Christian",
+        "Louis",
+        "Sonia",
+        "Anya",
+        "Greg",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-22",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Galen",
+        "Tess"
+      ],
+      "unavailable": [
+        "Vik",
+        "Christian",
+        "Louis",
+        "Sonia",
+        "Anya",
+        "Greg",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-22",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Chelsea",
+        "Riley"
+      ],
+      "unavailable": [
+        "Vik",
+        "Christian",
+        "Louis",
+        "Sonia",
+        "Anya",
+        "Greg",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-27",
+      "pace": "Spicy",
+      "title": "Rides & Strides",
+      "start_time": "19:00",
+      "status": "completed",
+      "leaders": [
+        "Antoine"
+      ],
+      "unavailable": [
+        "Greg"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Riley maybe joining medium for the ride (NEW BIKE!!!)",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-27",
+      "pace": "Medium",
+      "title": "Rides & Strides",
+      "start_time": "19:00",
+      "status": "completed",
+      "leaders": [
+        "Galen"
+      ],
+      "unavailable": [
+        "Greg"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Riley maybe joining medium for the ride (NEW BIKE!!!)",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-27",
+      "pace": "Mild",
+      "title": "Rides & Strides",
+      "start_time": "19:00",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [
+        "Greg"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Riley maybe joining medium for the ride (NEW BIKE!!!)",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-29",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Ajax",
+        "Antoine",
+        "George"
+      ],
+      "unavailable": [
+        "Greg",
+        "Louis",
+        "Riley"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "GN earlybird ride: Barn Loop, meet at 6:15, roll at 6:30 https://www.strava.com/routes/3303371917193326892",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-29",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Vik",
+        "Galen"
+      ],
+      "unavailable": [
+        "Greg",
+        "Louis",
+        "Riley"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "GN earlybird ride: Barn Loop, meet at 6:15, roll at 6:30 https://www.strava.com/routes/3303371917193326892",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-08-29",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Sonia",
+        "Chelsea"
+      ],
+      "unavailable": [
+        "Greg",
+        "Louis",
+        "Riley"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "GN earlybird ride: Barn Loop, meet at 6:15, roll at 6:30 https://www.strava.com/routes/3303371917193326892",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26"
+    },
+    {
+      "ride_date": "2026-09-03",
+      "pace": "Spicy",
+      "title": "Rides & Strides",
+      "start_time": "19:00",
+      "status": "completed",
+      "leaders": [
+        "Anya",
+        "Ajax"
+      ],
+      "unavailable": [
+        "Louis",
+        "Galen",
+        "Greg",
+        "Tess"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Riley joining medium for the ride (NEW BIKE!!!)",
+      "needs_review": 1,
+      "review_reason": "Time differs: August 26=19:00 vs September 26=08:30",
+      "source_sheet": "August 26, September 26"
+    },
+    {
+      "ride_date": "2026-09-03",
+      "pace": "Medium",
+      "title": "Rides & Strides",
+      "start_time": "19:00",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [
+        "Louis",
+        "Galen",
+        "Greg",
+        "Tess"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Riley joining medium for the ride (NEW BIKE!!!)",
+      "needs_review": 1,
+      "review_reason": "Time differs: August 26=19:00 vs September 26=09:00",
+      "source_sheet": "August 26, September 26"
+    },
+    {
+      "ride_date": "2026-09-03",
+      "pace": "Mild",
+      "title": "Rides & Strides",
+      "start_time": "19:00",
+      "status": "completed",
+      "leaders": [
+        "Sonia"
+      ],
+      "unavailable": [
+        "Louis",
+        "Galen",
+        "Greg",
+        "Tess"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Riley joining medium for the ride (NEW BIKE!!!)",
+      "needs_review": 1,
+      "review_reason": "Time differs: August 26=19:00 vs September 26=09:30",
+      "source_sheet": "August 26, September 26"
+    },
+    {
+      "ride_date": "2026-09-05",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Ajax",
+        "Mahdi",
+        "Gabe"
+      ],
+      "unavailable": [
+        "Louis",
+        "Greg",
+        "Galen",
+        "Tess",
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Asked for backup but can't: Elouan, Megan",
+      "needs_review": 1,
+      "review_reason": "Leaders differ: August 26=['Ajax', 'Mahdi', 'Gabe'] vs September 26=['Ajax', 'Gabe', 'Mahdi', 'Louis']",
+      "source_sheet": "August 26, September 26"
+    },
+    {
+      "ride_date": "2026-09-05",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Vik",
+        "Flo",
+        "Ferdinand"
+      ],
+      "unavailable": [
+        "Louis",
+        "Greg",
+        "Galen",
+        "Tess",
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Asked for backup but can't: Elouan, Megan",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26, September 26"
+    },
+    {
+      "ride_date": "2026-09-05",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Riley"
+      ],
+      "unavailable": [
+        "Louis",
+        "Greg",
+        "Galen",
+        "Tess",
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Asked for backup but can't: Elouan, Megan",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "August 26, September 26"
+    },
+    {
+      "ride_date": "2026-09-10",
+      "pace": "Spicy",
+      "title": "Rides & Strides",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Ajax"
+      ],
+      "unavailable": [
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Riley will lead Mild if we do the Marne - Happy to do Marne instead ! x Tess",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-10",
+      "pace": "Medium",
+      "title": "Rides & Strides",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Anya"
+      ],
+      "unavailable": [
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Riley will lead Mild if we do the Marne - Happy to do Marne instead ! x Tess",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-10",
+      "pace": "Mild",
+      "title": "Rides & Strides",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Riley"
+      ],
+      "unavailable": [
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Riley will lead Mild if we do the Marne - Happy to do Marne instead ! x Tess",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-12",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Louis",
+        "Mahdi"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Ajax",
+        "Anya",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Anya and Ajax triathloning in Evian. \nDepending on how earlybird trial goes Galen could do another one here? Aye, up for early bird again xT Asked for backup, but can't: Ferdindand, Meghan, Elouan,",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-12",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Galen"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Ajax",
+        "Anya",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Anya and Ajax triathloning in Evian. \nDepending on how earlybird trial goes Galen could do another one here? Aye, up for early bird again xT Asked for backup, but can't: Ferdindand, Meghan, Elouan,",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-12",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Sonia",
+        "Chelsea"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Ajax",
+        "Anya",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Anya and Ajax triathloning in Evian. \nDepending on how earlybird trial goes Galen could do another one here? Aye, up for early bird again xT Asked for backup, but can't: Ferdindand, Meghan, Elouan,",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-17",
+      "pace": "Spicy",
+      "title": "Rides & Strides",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Ajax"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "LIKELY LAST RIDES & STRIDES MAYBE SPECIAL EVENT RIDE; Riley maybe riding with Medium (riley for sure riding in medium 👹)",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-17",
+      "pace": "Medium",
+      "title": "Rides & Strides",
+      "start_time": "19:00",
+      "status": "completed",
+      "leaders": [
+        "Galen",
+        "Greg",
+        "Ewan"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "LIKELY LAST RIDES & STRIDES MAYBE SPECIAL EVENT RIDE; Riley maybe riding with Medium (riley for sure riding in medium 👹)",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-17",
+      "pace": "Mild",
+      "title": "Rides & Strides",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [
+        "Antoine",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "LIKELY LAST RIDES & STRIDES MAYBE SPECIAL EVENT RIDE; Riley maybe riding with Medium (riley for sure riding in medium 👹)",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-19",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride (Sena Test)",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Ajax",
+        "Louis"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Greg",
+        "Galen"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "SENA TEST",
+      "needs_review": 1,
+      "review_reason": "Parenthetical note on leader 'Ajax (M)' in source; Parenthetical note on leader 'Louis (M)' in source",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-19",
+      "pace": "Medium",
+      "title": "Saturday Club Ride (Sena Test)",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Vik"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Greg",
+        "Galen"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "SENA TEST",
+      "needs_review": 1,
+      "review_reason": "Parenthetical note on leader 'Viks (S)' in source",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-19",
+      "pace": "Mild",
+      "title": "Saturday Club Ride (Sena Test)",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Riley",
+        "Chelsea"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Greg",
+        "Galen"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "SENA TEST",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-24",
+      "pace": "Spicy",
+      "title": "Rides & Strides",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Ajax"
+      ],
+      "unavailable": [
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "LAST RIDES & STRIDES",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-24",
+      "pace": "Medium",
+      "title": "Rides & Strides",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Galen",
+        "Greg"
+      ],
+      "unavailable": [
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "LAST RIDES & STRIDES",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-24",
+      "pace": "Mild",
+      "title": "Rides & Strides",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Riley"
+      ],
+      "unavailable": [
+        "Antoine"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "LAST RIDES & STRIDES",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-26",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Ajax",
+        "Mahdi"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Galen available for earlybird medium. Ferdinand suggested medium route, if other suggestion please lmk !",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-26",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Ferdinand"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Galen available for earlybird medium. Ferdinand suggested medium route, if other suggestion please lmk !",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-09-26",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Chelsea"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "Galen available for earlybird medium. Ferdinand suggested medium route, if other suggestion please lmk !",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "September 26"
+    },
+    {
+      "ride_date": "2026-10-03",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride (Sena Test)",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Ajax",
+        "Mahdi",
+        "Louis"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Galen",
+        "Greg"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "SENA TEST - Riley maybe available",
+      "needs_review": 1,
+      "review_reason": "Tentative availability mentioned in day notes; Leaders differ: September 26=['Ajax', 'Mahdi', 'Louis'] vs October 26=['Ajax', 'Mahdi']",
+      "source_sheet": "September 26, October 26"
+    },
+    {
+      "ride_date": "2026-10-03",
+      "pace": "Medium",
+      "title": "Saturday Club Ride (Sena Test)",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Vik"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Galen",
+        "Greg"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "SENA TEST - Riley maybe available",
+      "needs_review": 1,
+      "review_reason": "Tentative availability mentioned in day notes",
+      "source_sheet": "September 26, October 26"
+    },
+    {
+      "ride_date": "2026-10-03",
+      "pace": "Mild",
+      "title": "Saturday Club Ride (Sena Test)",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Chelsea"
+      ],
+      "unavailable": [
+        "Antoine",
+        "Galen",
+        "Greg"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "SENA TEST - Riley maybe available",
+      "needs_review": 1,
+      "review_reason": "Tentative availability mentioned in day notes",
+      "source_sheet": "September 26, October 26"
+    },
+    {
+      "ride_date": "2026-10-11",
+      "pace": "Spicy",
+      "title": "LPCC x Hyperice x KIIN Event",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Mahdi",
+        "Louis"
+      ],
+      "unavailable": [
+        "Riley",
+        "Greg",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "EVENT WITH HYPERICE (sports recovery brand) and KIIN. Short run and ride, with a post-ride / run recovery session",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-11",
+      "pace": "Medium",
+      "title": "LPCC x Hyperice x KIIN Event",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Vik"
+      ],
+      "unavailable": [
+        "Riley",
+        "Greg",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "EVENT WITH HYPERICE (sports recovery brand) and KIIN. Short run and ride, with a post-ride / run recovery session",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-11",
+      "pace": "Mild",
+      "title": "LPCC x Hyperice x KIIN Event",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [
+        "Sonia"
+      ],
+      "unavailable": [
+        "Riley",
+        "Greg",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "EVENT WITH HYPERICE (sports recovery brand) and KIIN. Short run and ride, with a post-ride / run recovery session",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-17",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Ajax",
+        "Mahdi",
+        "Louis"
+      ],
+      "unavailable": [
+        "Riley",
+        "Greg",
+        "Galen",
+        "Chelsea"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-17",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Vik"
+      ],
+      "unavailable": [
+        "Riley",
+        "Greg",
+        "Galen",
+        "Chelsea"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-17",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [
+        "Riley",
+        "Greg",
+        "Galen",
+        "Chelsea"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-24",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "cancelled",
+      "leaders": [],
+      "unavailable": [
+        "Greg",
+        "Chelsea",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "Gif-sur-Yvette RER station (Medium drop)",
+      "notes": "Medium drop point: Gif-sur-Yvette RER station. Bakery stop: Boulangerie Jourdan Eric also in Gif. Other rides cancelled because of protests and organisational reasons",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-24",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Galen"
+      ],
+      "unavailable": [
+        "Greg",
+        "Chelsea",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "Gif-sur-Yvette RER station (Medium drop)",
+      "notes": "Medium drop point: Gif-sur-Yvette RER station. Bakery stop: Boulangerie Jourdan Eric also in Gif. Other rides cancelled because of protests and organisational reasons",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-24",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "cancelled",
+      "leaders": [],
+      "unavailable": [
+        "Greg",
+        "Chelsea",
+        "Ajax"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "Gif-sur-Yvette RER station (Medium drop)",
+      "notes": "Medium drop point: Gif-sur-Yvette RER station. Bakery stop: Boulangerie Jourdan Eric also in Gif. Other rides cancelled because of protests and organisational reasons",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-31",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Louis",
+        "Mahdi"
+      ],
+      "unavailable": [
+        "Galen",
+        "Greg",
+        "Ajax",
+        "Chelsea",
+        "Anya"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-31",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Vik"
+      ],
+      "unavailable": [
+        "Galen",
+        "Greg",
+        "Ajax",
+        "Chelsea",
+        "Anya"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-10-31",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [
+        "Galen",
+        "Greg",
+        "Ajax",
+        "Chelsea",
+        "Anya"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "October 26"
+    },
+    {
+      "ride_date": "2026-11-07",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [
+        "Galen",
+        "Greg",
+        "Riley",
+        "Mahdi",
+        "Sonia",
+        "Anya"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-07",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Vik"
+      ],
+      "unavailable": [
+        "Galen",
+        "Greg",
+        "Riley",
+        "Mahdi",
+        "Sonia",
+        "Anya"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-07",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [
+        "Galen",
+        "Greg",
+        "Riley",
+        "Mahdi",
+        "Sonia",
+        "Anya"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-15",
+      "pace": "Spicy",
+      "title": "End of Season Event Ride",
+      "start_time": "08:30",
+      "status": "completed",
+      "leaders": [
+        "Mahdi",
+        "Louis",
+        "Ajax",
+        "Anya"
+      ],
+      "unavailable": [
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "Le Peloton Studio",
+      "notes": "END OF SEASON EVENT ride + lunch and drinks at Le Peloton Studio\nLunch only: Sonia, Riley, Chelsea, Antoine",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-15",
+      "pace": "Medium",
+      "title": "End of Season Event Ride",
+      "start_time": "09:00",
+      "status": "completed",
+      "leaders": [
+        "Galen"
+      ],
+      "unavailable": [
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "Le Peloton Studio",
+      "notes": "END OF SEASON EVENT ride + lunch and drinks at Le Peloton Studio\nLunch only: Sonia, Riley, Chelsea, Antoine",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-15",
+      "pace": "Mild",
+      "title": "End of Season Event Ride",
+      "start_time": "09:30",
+      "status": "completed",
+      "leaders": [],
+      "unavailable": [
+        "Vik"
+      ],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "Le Peloton Studio",
+      "notes": "END OF SEASON EVENT ride + lunch and drinks at Le Peloton Studio\nLunch only: Sonia, Riley, Chelsea, Antoine",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-21",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-21",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-21",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-28",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-28",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-11-28",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26"
+    },
+    {
+      "ride_date": "2026-12-05",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26, December 26"
+    },
+    {
+      "ride_date": "2026-12-05",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26, December 26"
+    },
+    {
+      "ride_date": "2026-12-05",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "November 26, December 26"
+    },
+    {
+      "ride_date": "2026-12-12",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2026-12-12",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2026-12-12",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2026-12-19",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2026-12-19",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2026-12-19",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2026-12-26",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2026-12-26",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2026-12-26",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2027-01-02",
+      "pace": "Spicy",
+      "title": "Saturday Club Ride",
+      "start_time": "08:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2027-01-02",
+      "pace": "Medium",
+      "title": "Saturday Club Ride",
+      "start_time": "09:00",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    },
+    {
+      "ride_date": "2027-01-02",
+      "pace": "Mild",
+      "title": "Saturday Club Ride",
+      "start_time": "09:30",
+      "status": "open",
+      "leaders": [],
+      "unavailable": [],
+      "route_name": "",
+      "route_url": "",
+      "meeting_point": "",
+      "notes": "",
+      "needs_review": 0,
+      "review_reason": "",
+      "source_sheet": "December 26"
+    }
+  ],
+  "planning_notes": "Club Schedule Notes (from Ride Leading Schedule.xlsx):\n• 2026-12-15 (Tue): Le Peloton Christmas Party!\n• 2026-12-24 & 2026-12-25: Café Closed\n• Standard Saturday/Sunday times: 08:30 Spicy, 09:00 Medium, 09:30 Mild.\n• Review flagged entries from the Excel import (Dec 5 date typo, July missing times, tentative leaders)."
+}

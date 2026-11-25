@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Le Peloton Café — Paris Bike Rental</title>
-  <meta name="description" content="Carbon road, gravel, and city bike rentals from Le Peloton Café in Le Marais, Paris.">
+  <title>Le Peloton Café — Rentals, Tours, Cycling Club &amp; Specialty Coffee</title>
+  <meta name="description" content="Carbon road, gravel, and city bike rentals, guided Bike About Tours, weekly Cycling Club rides, Le Peloton Studio (l’Échappée), and specialty coffee in Le Marais, Paris.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
@@ -19,14 +19,16 @@
       </a>
 
       <nav class="nav-links" aria-label="Primary">
-        <a href="#story" id="navStoryLink">Our story</a>
-        <a href="#fleet" id="navFleetLink">Fleet</a>
-        <a href="#clubhouse" id="navClubhouseLink">Clubhouse</a>
+        <a href="#story" id="navStoryLink">Story</a>
+        <a href="#fleet" id="navFleetLink">Rentals</a>
+        <a href="#tours" id="navToursLink">Tours</a>
+        <a href="#club" id="navClubLink">Cycling Club</a>
+        <a href="#cafe-studio" id="navCafeLink">Café &amp; Studio</a>
       </nav>
 
       <div class="nav-right">
         <div class="gliding-seg seg-lang" id="langSeg" role="radiogroup" aria-label="Language"></div>
-        <button type="button" class="nav-bag-btn" id="navBagBtn" aria-label="Open rental bag">
+        <button type="button" class="nav-bag-btn" id="navBagBtn" aria-label="Open bag">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M6 7h12l1 13H5L6 7z"></path>
             <path d="M9 7V5a3 3 0 0 1 6 0v2"></path>
@@ -48,10 +50,10 @@
       <div class="wrap hero-content">
         <p class="hero-kicker hero-enter" style="--stagger: 0" id="heroKicker">17 Rue du Pont Louis-Philippe · Le Marais</p>
         <h1 class="hero-title hero-enter" style="--stagger: 1" id="heroTitle">Coffee, community,<br>and cycling in Paris.</h1>
-        <p class="hero-sub hero-enter" style="--stagger: 2" id="heroSub">Carbon road, gravel, city, and family bike rentals from the heart of the Marais—backed by our specialty coffee café, Cycling Club, and sister company Bike About Tours.</p>
+        <p class="hero-sub hero-enter" style="--stagger: 2" id="heroSub">Carbon road, gravel, city, and family bike rentals, guided Bike About Tours, weekly Cycling Club rides, and specialty coffee from one Marais hub.</p>
         <div class="hero-actions hero-enter" style="--stagger: 3">
-          <a href="#fleet" class="btn-yellow" id="heroCtaPrimary">Explore the fleet</a>
-          <a href="#story" class="btn-glass" id="heroCtaSecondary">Our story</a>
+          <a href="#fleet" class="btn-yellow" id="heroCtaPrimary">Rent a bike</a>
+          <a href="#tours" class="btn-glass" id="heroCtaSecondary">Guided tours</a>
         </div>
       </div>
     </section>
@@ -77,7 +79,7 @@
         <div class="fleet-head">
           <div>
             <h2 class="fleet-title" id="fleetHeading">Choose your ride</h2>
-            <p class="fleet-meta" id="fleetMeta">Helmet &amp; repair kit included · 20% French VAT incl.</p>
+            <p class="fleet-meta" id="fleetMeta">Helmet &amp; repair kit included · Live workshop inventory · 20% French VAT incl.</p>
           </div>
         </div>
 
@@ -122,6 +124,133 @@
       </div>
     </section>
 
+    <section class="tours-band" id="tours" aria-labelledby="toursHeading">
+      <div class="wrap">
+        <div class="band-head band-head-dark">
+          <div>
+            <p class="clubhouse-eyebrow" id="toursEyebrow">Sister company · Bike About Tours</p>
+            <h2 class="fleet-title" id="toursHeading">Guided rides through Paris &amp; Versailles</h2>
+            <p class="band-meta-dark" id="toursMeta">Small groups led from Le Marais · Bikes, helmets &amp; tickets included</p>
+          </div>
+          <div class="tour-date-bar">
+            <label for="tourDateInput" id="lblTourDate">Tour date</label>
+            <input type="date" id="tourDateInput">
+          </div>
+        </div>
+
+        <div class="tours-grid" id="toursGrid"></div>
+      </div>
+    </section>
+
+    <section class="club-band" id="club" aria-labelledby="clubHeading">
+      <div class="wrap">
+        <div class="band-head">
+          <div>
+            <p class="section-eyebrow" id="clubEyebrow">Weekly Road &amp; Gravel · Mild · Medium · Spicy</p>
+            <h2 class="fleet-title" id="clubHeading">Le Peloton Cycling Club</h2>
+            <p class="fleet-meta" id="clubMeta">Departing 17 Rue du Pont Louis-Philippe · Select a ride date to view leaders, volunteer to lead, or book a rental bike.</p>
+          </div>
+        </div>
+
+        <div class="club-deck">
+          <div class="club-deck-top">
+            <div class="deck-field">
+              <label for="clubDateInput" id="lblClubDate">Ride date</label>
+              <input type="date" id="clubDateInput">
+            </div>
+            <div class="club-upcoming-wrap">
+              <span class="field-caption" id="lblClubUpcoming">Scheduled club dates</span>
+              <div class="club-date-pills" id="clubDatePills"></div>
+            </div>
+            <div class="deck-field club-leader-field">
+              <label for="clubLeaderInput" id="lblClubLeader">Ride leader name</label>
+              <input type="text" id="clubLeaderInput" list="clubLeaderDatalist" maxlength="48" placeholder="Choose or type your name">
+              <datalist id="clubLeaderDatalist"></datalist>
+            </div>
+          </div>
+          <p class="club-feedback" id="clubFeedback" hidden role="status"></p>
+        </div>
+
+        <div class="club-grid" id="clubGrid"></div>
+      </div>
+    </section>
+
+    <section class="cafe-band" id="cafe-studio" aria-labelledby="cafeHeading">
+      <div class="wrap">
+        <div class="band-head">
+          <div>
+            <p class="section-eyebrow" id="cafeEyebrow">Specialty Coffee &amp; Modular Event Space</p>
+            <h2 class="fleet-title" id="cafeHeading">In the cup &amp; three doors down</h2>
+          </div>
+        </div>
+
+        <div class="cafe-studio-grid">
+          <div class="menu-ledger">
+            <div class="ledger-head">
+              <h3 id="cafeMenuHeading">Specialty Coffee &amp; Kitchen</h3>
+              <p class="ledger-roasters" id="cafeRoasters"></p>
+            </div>
+
+            <h4 class="ledger-subhead" id="cafeDrinksHeading">Espresso, Filter &amp; Cold Drinks</h4>
+            <dl class="ledger-list" id="cafeDrinksList"></dl>
+
+            <h4 class="ledger-subhead" id="cafeFoodHeading">Stuffed Croissants, Bowls &amp; Pastries</h4>
+            <dl class="ledger-list" id="cafeFoodList"></dl>
+
+            <p class="ledger-note" id="cafeModifiers"></p>
+          </div>
+
+          <div class="studio-panel">
+            <div class="studio-photo-wrap">
+              <img src="./assets/img/story-coffee.jpg" alt="Specialty coffee service inside Le Peloton Café">
+              <div class="studio-badges">
+                <span id="studioAreaBadge">80 m²</span>
+                <span id="studioCapBadge">~65 seated · 80+ standing</span>
+              </div>
+            </div>
+
+            <div class="studio-body">
+              <h3 id="studioHeading">Le Peloton Studio — l’Échappée</h3>
+              <p class="studio-loc" id="studioLocation"></p>
+              <ul class="studio-features" id="studioFeaturesList"></ul>
+
+              <hr class="deck-rule">
+
+              <h4 class="studio-form-title" id="studioFormTitle">Book l’Échappée for a pop-up, press launch, or team event</h4>
+              <form class="studio-form" id="studioForm">
+                <div class="field-pair">
+                  <div class="guest-field">
+                    <label for="studioNameInput" id="lblStudioName">Your name / brand</label>
+                    <input type="text" id="studioNameInput" class="text-input" required maxlength="80">
+                  </div>
+                  <div class="guest-field">
+                    <label for="studioEmailInput" id="lblStudioEmail">Work email</label>
+                    <input type="email" id="studioEmailInput" class="text-input" required maxlength="100">
+                  </div>
+                </div>
+                <div class="field-pair">
+                  <div class="guest-field">
+                    <label for="studioDateInput" id="lblStudioDate">Preferred date</label>
+                    <input type="date" id="studioDateInput" class="text-input">
+                  </div>
+                  <div class="guest-field">
+                    <label for="studioGuestsInput" id="lblStudioGuests">Expected guests</label>
+                    <input type="number" id="studioGuestsInput" class="text-input" min="5" max="200" value="40">
+                  </div>
+                </div>
+                <div class="guest-field">
+                  <label for="studioNotesInput" id="lblStudioNotes">Tell us about your activation, ride, or hospitality needs</label>
+                  <textarea id="studioNotesInput" class="text-area" rows="3" maxlength="600"></textarea>
+                </div>
+                <button type="submit" class="btn-yellow" id="studioSubmitBtn">Send studio inquiry</button>
+                <p class="studio-sent" id="studioSentMsg" hidden role="status"></p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="clubhouse-band" id="clubhouse" aria-labelledby="clubhouseHeading">
       <div class="wrap clubhouse-grid">
         <div class="clubhouse-info">
@@ -145,7 +274,7 @@
             <a class="clubhouse-link" href="mailto:contact@lepelotoncafe.com">contact@lepelotoncafe.com</a>
             <a class="clubhouse-link" href="https://www.lepelotoncafe.cc/" target="_blank" rel="noopener noreferrer">lepelotoncafe.cc</a>
             <a class="clubhouse-link" href="https://www.bikeabouttours.com/" target="_blank" rel="noopener noreferrer">bikeabouttours.com</a>
-            <a class="clubhouse-link" id="clubhousePortalLink" href="https://app.booking.bike.rent/book?store=lepelotoncafe&offering=rental" target="_blank" rel="noopener noreferrer">Open live BRM portal</a>
+            <a class="clubhouse-link" id="staffOpsLink" href="./admin">Staff Ops</a>
           </div>
         </div>
 
@@ -161,9 +290,9 @@
     </section>
   </main>
 
-  <button type="button" class="bag-dock" id="bagDock" hidden aria-label="Open rental bag">
+  <button type="button" class="bag-dock" id="bagDock" hidden aria-label="Open bag">
     <span class="dock-dot" aria-hidden="true"></span>
-    <span id="dockCountLabel">1 bike</span>
+    <span id="dockCountLabel">1 item</span>
     <span class="dock-sep" aria-hidden="true">·</span>
     <strong id="dockTotalLabel">€70</strong>
     <span class="dock-cta" id="dockCtaLabel">Open bag</span>
@@ -232,7 +361,7 @@
   <div class="drawer-backdrop" id="bagBackdrop" hidden>
     <aside class="bag-drawer" id="bagDrawer" role="dialog" aria-modal="true" aria-labelledby="bagDrawerTitle">
       <div class="sheet-head">
-        <h2 id="bagDrawerTitle">Rental bag</h2>
+        <h2 id="bagDrawerTitle">Your Peloton bag</h2>
         <button type="button" class="close-circle" id="closeBagDrawer" aria-label="Close">✕</button>
       </div>
       <div class="sheet-body" id="bagDrawerBody"></div>

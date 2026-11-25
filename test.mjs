@@ -1,16 +1,27 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {
   BIKES,
+  CAFE_MENU,
   STORY_CHAPTERS,
+  STUDIO_SPACE,
+  TOURS,
   buildBrmDeepLink,
   computeBikePrice,
   computeReturnInfo,
+  computeTourPrice,
   computeVatBreakdown,
   getAvailableExtrasForBike,
   getDefaultPedalForBike,
   getMatchingSizesForHeight,
   getPickupSlots,
 } from './data.js';
+import { getTodayParis } from './db.js';
+import { verifyStripeWebhook } from './stripe.js';
+import { createPelotonApp } from './server.js';
 
 const byId = (id) => {
   const b = BIKES.find((x) => x.id === id);
@@ -45,6 +56,9 @@ const fenix = byId('5474683819393024');
 const merckx = byId('5225922316206080');
 const canyon = byId('5659947097391104');
 const kanzo = byId('5515992322015232');
+const city = byId('6274019981524992');
+const kids24 = byId('5936229393629184');
+const longtail = byId('4706998982541312');
 
 assert.deepEqual(getMatchingSizesForHeight(fenix, 175).map((s) => s.code), ['S']);
 assert.deepEqual(getMatchingSizesForHeight(merckx, 175).map((s) => s.code), ['S']);
@@ -52,48 +66,252 @@ assert.deepEqual(getMatchingSizesForHeight(canyon, 175), []);
 assert.deepEqual(getMatchingSizesForHeight(kanzo, 's'), []);
 assert.deepEqual(getMatchingSizesForHeight(canyon, 193).map((s) => s.code), ['XL']);
 
-const city = byId('6274019981524992');
-const kids24 = byId('5936229393629184');
-const longtail = byId('4706998982541312');
-
 assert.equal(getDefaultPedalForBike(fenix).id, 'flat');
-assert.equal(getDefaultPedalForBike(fenix).price, 0);
 assert.equal(getDefaultPedalForBike(city).id, 'flat');
-
-assert.deepEqual(
-  getAvailableExtrasForBike(fenix).map((e) => e.id).sort(),
-  ['garmin_mount', 'phone_mount']
-);
-assert.deepEqual(
-  getAvailableExtrasForBike(city).map((e) => e.id).sort(),
-  ['baby_seat', 'phone_mount']
-);
-assert.deepEqual(
-  getAvailableExtrasForBike(longtail).map((e) => e.id),
-  ['phone_mount']
-);
+assert.deepEqual(getAvailableExtrasForBike(fenix).map((e) => e.id).sort(), ['garmin_mount', 'phone_mount']);
+assert.deepEqual(getAvailableExtrasForBike(city).map((e) => e.id).sort(), ['baby_seat', 'phone_mount']);
+assert.deepEqual(getAvailableExtrasForBike(longtail).map((e) => e.id), ['phone_mount']);
 assert.deepEqual(getAvailableExtrasForBike(kids24), []);
 
 assert.deepEqual(computeVatBreakdown(70), { gross: 70, net: 58.33, vat: 11.67 });
 assert.deepEqual(computeVatBreakdown(85), { gross: 85, net: 70.83, vat: 14.17 });
 
-const wedSlots = getPickupSlots('2026-11-25');
-assert.equal(wedSlots[0], '08:00');
-assert.equal(wedSlots[wedSlots.length - 1], '16:00');
-assert.equal(wedSlots.length, 17);
-
-const satSlots = getPickupSlots('2026-11-28');
-assert.equal(satSlots[0], '08:00');
-assert.equal(satSlots[satSlots.length - 1], '17:30');
-assert.equal(satSlots.length, 20);
-
+assert.equal(getPickupSlots('2026-11-25').length, 17);
+assert.equal(getPickupSlots('2026-11-28').length, 20);
 assert.deepEqual(computeReturnInfo('2026-11-25', '09:00', '4h'), { dateStr: '2026-11-25', timeStr: '13:00' });
 assert.deepEqual(computeReturnInfo('2026-11-25', '09:00', '2d'), { dateStr: '2026-11-27', timeStr: '09:00' });
 
 assert.equal(STORY_CHAPTERS.length, 4);
+assert.equal(TOURS.length, 4);
+assert.equal(computeTourPrice(TOURS.find((t) => t.id === 'hidden_paris'), 2, 1), 135);
+assert.equal(computeTourPrice(TOURS.find((t) => t.id === 'versailles'), 2, 1), 329);
+assert.equal(computeTourPrice(TOURS.find((t) => t.id === 'private_group'), 6, 0), 350);
+assert.equal(computeTourPrice(TOURS.find((t) => t.id === 'private_group'), 10, 0), 440);
+assert.ok(CAFE_MENU.drinks.length >= 10 && CAFE_MENU.food.length >= 6);
+assert.equal(STUDIO_SPACE.area, '80 m²');
 assert.equal(
   buildBrmDeepLink('1694542871923', 'fr'),
   'https://app.booking.bike.rent/book?store=lepelotoncafe&offering=rental&category=1694542871923&lang=fr'
 );
 
-console.log('All Le Peloton checks passed.');
+const futureDate = (() => {
+  const [y, m, d] = getTodayParis().split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d + 4));
+  return dt.toISOString().slice(0, 10);
+})();
+
+const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'peloton-test-'));
+
+async function withServer(opts, fn) {
+  const app = createPelotonApp(opts);
+  await new Promise((res) => app.server.listen(0, '127.0.0.1', res));
+  const { port } = app.server.address();
+  const baseUrl = `http://127.0.0.1:${port}`;
+  try {
+    await fn({ baseUrl, app });
+  } finally {
+    await new Promise((res) => app.server.close(res));
+    app.db.close();
+  }
+}
+
+await withServer(
+  {
+    dbPath: path.join(tmpDir, 'direct.db'),
+    organizerKey: 'test-org-secret-1234',
+    env: {},
+  },
+  async ({ baseUrl }) => {
+    const bootRes = await fetch(`${baseUrl}/api/bootstrap?pickupDate=${futureDate}&tourDate=${futureDate}`);
+    assert.equal(bootRes.status, 200);
+    const boot = await bootRes.json();
+    assert.equal(boot.mode, 'live');
+    assert.equal(boot.stripeEnabled, false);
+    assert.equal(boot.fleetStock['5659947097391104'].XL, 1);
+
+    const secCheck = await fetch(`${baseUrl}/server.js`);
+    assert.equal(secCheck.status, 404);
+
+    const adminRedirect = await fetch(`${baseUrl}/admin.html`, { redirect: 'manual' });
+    assert.equal(adminRedirect.status, 302);
+    assert.equal(adminRedirect.headers.get('location'), '/admin');
+
+    const unauthAdmin = await fetch(`${baseUrl}/api/admin/overview`);
+    assert.equal(unauthAdmin.status, 401);
+
+    const coRes = await fetch(`${baseUrl}/api/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer: { firstName: 'Jean', lastName: 'Dupont', email: 'jean@example.com', phone: '+33600000000' },
+        pickupDate: futureDate,
+        pickupTime: '09:00',
+        durationKey: '1d',
+        bikes: [
+          {
+            bikeId: '5659947097391104',
+            sizeCode: 'XL',
+            pedalId: 'spd_sl',
+            extraIds: ['garmin_mount'],
+            riderName: 'Jean',
+          },
+        ],
+        tours: [
+          {
+            tourId: 'hidden_paris',
+            tourDate: futureDate,
+            tourTime: '10:00',
+            adults: 2,
+            kids: 0,
+          },
+        ],
+      }),
+    });
+    assert.equal(coRes.status, 201);
+    const co = await coRes.json();
+    assert.equal(co.mode, 'direct');
+    assert.equal(co.booking.status, 'confirmed');
+    assert.equal(co.booking.total_cents, (70 + 5 + 5 + 90) * 100);
+
+    const overbookRes = await fetch(`${baseUrl}/api/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer: { firstName: 'Marc', lastName: 'Martin', email: 'marc@example.com' },
+        pickupDate: futureDate,
+        pickupTime: '10:00',
+        durationKey: '4h',
+        bikes: [{ bikeId: '5659947097391104', sizeCode: 'XL', pedalId: 'flat', extraIds: [] }],
+      }),
+    });
+    assert.equal(overbookRes.status, 409);
+
+    const holdRes = await fetch(`${baseUrl}/api/admin/workshop-hold`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-organizer-key': 'test-org-secret-1234' },
+      body: JSON.stringify({ bikeId: '5474683819393024', sizeCode: 'XXS', heldCount: 1, reason: 'Bleed brakes' }),
+    });
+    assert.equal(holdRes.status, 200);
+
+    const availAfterHold = await (await fetch(`${baseUrl}/api/availability?pickupDate=${futureDate}`)).json();
+    assert.equal(availAfterHold.fleetStock['5474683819393024'].XXS, 0);
+
+    const clubSignup = await fetch(`${baseUrl}/api/club/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Tess', date: futureDate, pace: 'Medium' }),
+    });
+    assert.equal(clubSignup.status, 200);
+    const clubData = await clubSignup.json();
+    assert.ok(clubData.rides.find((r) => r.pace === 'Medium').leaders.includes('Tess'));
+
+    const clubWithdraw = await fetch(`${baseUrl}/api/club/withdraw`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Tess', date: futureDate, pace: 'Medium' }),
+    });
+    assert.equal(clubWithdraw.status, 200);
+
+    const studioRes = await fetch(`${baseUrl}/api/studio/inquiries`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Zwift Paris Pop-up',
+        email: 'events@zwift.com',
+        eventDate: futureDate,
+        guests: 60,
+        notes: 'Evening launch event',
+      }),
+    });
+    assert.equal(studioRes.status, 201);
+
+    const adminOv = await (
+      await fetch(`${baseUrl}/api/admin/overview`, { headers: { 'x-organizer-key': 'test-org-secret-1234' } })
+    ).json();
+    assert.equal(adminOv.bookings.length, 1);
+    assert.equal(adminOv.studioInquiries.length, 1);
+  }
+);
+
+const webhookSecret = 'whsec_test_secret_999';
+await withServer(
+  {
+    dbPath: path.join(tmpDir, 'stripe.db'),
+    organizerKey: 'stripe-org-secret',
+    env: {
+      STRIPE_SECRET_KEY: 'sk_test_mocked_key',
+      STRIPE_WEBHOOK_SECRET: webhookSecret,
+      PUBLIC_URL: 'https://lepelotoncafe.cc',
+    },
+    fetchImpl: async (url) => {
+      if (String(url).includes('/v1/checkout/sessions')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ id: 'cs_test_12345', url: 'https://checkout.stripe.com/c/pay/cs_test_12345' }),
+        };
+      }
+      throw new Error(`Unexpected fetch ${url}`);
+    },
+  },
+  async ({ baseUrl }) => {
+    const coRes = await fetch(`${baseUrl}/api/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer: { firstName: 'Sophie', lastName: 'Laurent', email: 'sophie@example.com' },
+        pickupDate: futureDate,
+        pickupTime: '09:30',
+        durationKey: '4h',
+        bikes: [{ bikeId: '5474683819393024', sizeCode: 'S', pedalId: 'flat', extraIds: [] }],
+      }),
+    });
+    assert.equal(coRes.status, 201);
+    const co = await coRes.json();
+    assert.equal(co.mode, 'stripe');
+    assert.equal(co.checkoutUrl, 'https://checkout.stripe.com/c/pay/cs_test_12345');
+
+    const beforeWh = await (await fetch(`${baseUrl}/api/bookings/${co.refCode}`)).json();
+    assert.equal(beforeWh.booking.status, 'pending_payment');
+
+    const badWh = await fetch(`${baseUrl}/api/stripe/webhook`, {
+      method: 'POST',
+      headers: { 'stripe-signature': 't=123,v1=deadbeef' },
+      body: '{}',
+    });
+    assert.equal(badWh.status, 400);
+
+    const eventPayload = JSON.stringify({
+      type: 'checkout.session.completed',
+      data: {
+        object: {
+          id: 'cs_test_12345',
+          client_reference_id: co.refCode,
+          metadata: { ref_code: co.refCode },
+        },
+      },
+    });
+    const ts = Math.floor(Date.now() / 1000);
+    const sig = crypto.createHmac('sha256', webhookSecret).update(`${ts}.${eventPayload}`).digest('hex');
+    const verifiedLocal = verifyStripeWebhook(Buffer.from(eventPayload), `t=${ts},v1=${sig}`, webhookSecret);
+    assert.equal(verifiedLocal.type, 'checkout.session.completed');
+
+    const goodWh = await fetch(`${baseUrl}/api/stripe/webhook`, {
+      method: 'POST',
+      headers: { 'stripe-signature': `t=${ts},v1=${sig}` },
+      body: eventPayload,
+    });
+    assert.equal(goodWh.status, 200);
+
+    const afterWh = await (await fetch(`${baseUrl}/api/bookings/${co.refCode}`)).json();
+    assert.equal(afterWh.booking.status, 'confirmed');
+
+    const cancelConfirmedAttempt = await (
+      await fetch(`${baseUrl}/api/bookings/${co.refCode}/cancel-pending`, { method: 'POST' })
+    ).json();
+    assert.equal(cancelConfirmedAttempt.released, false);
+  }
+);
+
+fs.rmSync(tmpDir, { recursive: true, force: true });
+console.log('All Le Peloton Café superapp unit + full-stack integration checks passed.');

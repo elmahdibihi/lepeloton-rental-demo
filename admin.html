@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le Peloton Café — Staff &amp; Workshop Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="admin-body">
+  <header class="admin-top">
+    <div class="wrap admin-top-inner">
+      <div class="admin-brand-row">
+        <a href="./" class="brand" aria-label="Storefront">
+          <img src="./assets/img/peloton-wordmark.png" alt="Le Peloton Café" class="logo-light">
+        </a>
+        <div>
+          <span class="clubhouse-eyebrow">17 Rue du Pont Louis-Philippe</span>
+          <h1 class="admin-title">Workshop, Tours &amp; Club Operations</h1>
+        </div>
+      </div>
+
+      <div class="admin-actions">
+        <span class="admin-status-pill" id="adminStatusPill">Live SQLite</span>
+        <a href="./" class="btn-glass">Public Storefront</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap admin-main">
+    <div class="admin-kpis" id="adminKpis"></div>
+
+    <div class="admin-tab-bar">
+      <div class="gliding-seg" id="adminTabSeg" role="radiogroup" aria-label="Operations view"></div>
+      <button type="button" class="btn-ghost admin-refresh-btn" id="adminRefreshBtn">Refresh</button>
+    </div>
+
+    <section id="panelPrep" class="admin-panel"></section>
+    <section id="panelWorkshop" class="admin-panel" hidden></section>
+    <section id="panelClub" class="admin-panel" hidden></section>
+    <section id="panelStudio" class="admin-panel" hidden></section>
+  </main>
+
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>

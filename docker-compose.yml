@@ -1,0 +1,11 @@
+services:
+  peloton:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./data:/app/data

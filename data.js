@@ -497,19 +497,186 @@ export const BIKES = [
   },
 ];
 
+export const TOURS = [
+  {
+    id: 'hidden_paris',
+    name: { en: 'Hidden Paris Bike Tour', fr: 'Visite Paris Insolite à vélo' },
+    duration: { en: '3 hours · All ages', fr: '3 heures · Tous âges' },
+    adultPrice: 45,
+    childPrice: 45,
+    pricingType: 'per_rider',
+    capacity: 12,
+    slots: ['10:00', '14:30'],
+    image: './assets/img/story-city.jpg',
+    summary: {
+      en: 'Quiet Marais back streets, secret courtyards, Roman ruins, and medieval passageways with a local Bike About Tours guide.',
+      fr: 'Ruelles calmes du Marais, cours secrètes, vestiges romains et passages cachés avec un guide Bike About Tours.',
+    },
+    includes: {
+      en: 'City bike, helmet & local guide included',
+      fr: 'Vélo de ville, casque et guide inclus',
+    },
+  },
+  {
+    id: 'paris_monuments',
+    name: { en: 'Paris Monuments Bike Tour', fr: 'Visite Monuments de Paris à vélo' },
+    duration: { en: '3 hours · All ages', fr: '3 heures · Tous âges' },
+    adultPrice: 45,
+    childPrice: 45,
+    pricingType: 'per_rider',
+    capacity: 12,
+    slots: ['10:00', '14:30'],
+    image: './assets/img/story-family.jpg',
+    summary: {
+      en: 'Cruise car-free Seine banks and bike lanes past Notre-Dame, the Louvre, Champs-Élysées, and the Eiffel Tower.',
+      fr: 'Parcourez les berges de Seine et pistes cyclables devant Notre-Dame, le Louvre, les Champs-Élysées et la Tour Eiffel.',
+    },
+    includes: {
+      en: 'City bike, helmet & local guide included',
+      fr: 'Vélo de ville, casque et guide inclus',
+    },
+  },
+  {
+    id: 'versailles',
+    name: { en: 'Versailles Full-Day Bike Tour', fr: 'Journée complète à Versailles à vélo' },
+    duration: { en: '8 hours · Tickets incl.', fr: '8 heures · Billets inclus' },
+    adultPrice: 115,
+    childPrice: 99,
+    pricingType: 'per_rider',
+    capacity: 12,
+    slots: ['08:30'],
+    image: './assets/img/hero-rides.jpg',
+    summary: {
+      en: 'Royal woodland trails, food market stops for a Grand Canal picnic, Marie-Antoinette’s hamlet, and Château access.',
+      fr: 'Allées royales boisées, marché local pour pique-niquer au Grand Canal, hameau de la Reine et billets du Château.',
+    },
+    includes: {
+      en: 'Bike, RER train, Château & estate tickets included',
+      fr: 'Vélo, train RER et billets du domaine inclus',
+    },
+  },
+  {
+    id: 'private_group',
+    name: { en: 'Private Group Bike Tour', fr: 'Visite privée sur mesure' },
+    duration: { en: '3 hours · Custom route', fr: '3 heures · Parcours privé' },
+    groupBasePrice: 350,
+    includedRiders: 8,
+    extraRiderPrice: 45,
+    pricingType: 'private_group',
+    capacity: 16,
+    slots: ['09:30', '14:00'],
+    image: './assets/img/story-cobbles.jpg',
+    summary: {
+      en: 'Dedicated guide and tailored pace departing Le Peloton Café—from family sightseeing loops to fitted Ridley road rides.',
+      fr: 'Guide dédié et parcours adapté au départ du Peloton Café—balade famille dans Paris ou sortie route privée.',
+    },
+    includes: {
+      en: 'Up to 8 riders included (€45 per extra rider)',
+      fr: 'Jusqu’à 8 cyclistes inclus (+45 € par cycliste supp.)',
+    },
+  },
+];
+
+export const CLUB_PACES = [
+  {
+    pace: 'Mild',
+    speed: '18–21 km/h',
+    defaultTime: '09:30',
+    maxLeaders: 4,
+    detail: {
+      en: 'Conversational no-drop social pace · 40–65 km',
+      fr: 'Allure conviviale sans lâcher personne · 40–65 km',
+    },
+  },
+  {
+    pace: 'Medium',
+    speed: '22–25 km/h',
+    defaultTime: '09:00',
+    maxLeaders: 4,
+    detail: {
+      en: 'Steady endurance group riding · 60–85 km',
+      fr: 'Endurance régulière en peloton · 60–85 km',
+    },
+  },
+  {
+    pace: 'Spicy',
+    speed: '26–29 km/h',
+    defaultTime: '08:30',
+    maxLeaders: 4,
+    detail: {
+      en: 'Brisk paceline & surrounding climbs · 75–100 km',
+      fr: 'Relais soutenus et bosses franciliennes · 75–100 km',
+    },
+  },
+];
+
+export const CAFE_MENU = {
+  roasters: 'Belleville · Ambicion · Plural · Coutume',
+  modifiers: {
+    en: 'Oat milk +€0.50 · Extra espresso shot +€1.00 · Dog-friendly café',
+    fr: 'Lait d’avoine +0,50 € · Shot espresso supp. +1,00 € · Café dog-friendly',
+  },
+  drinks: [
+    { name: { en: 'Espresso / Double Espresso', fr: 'Espresso / Double Espresso' }, price: '€2.50 / €3.50' },
+    { name: { en: 'Allongé', fr: 'Allongé' }, price: '€3.00' },
+    { name: { en: 'Noisette', fr: 'Noisette' }, price: '€3.50' },
+    { name: { en: 'Americano (Hot / Iced)', fr: 'Americano (Chaud / Glacé)' }, price: '€4.00 / €4.50' },
+    { name: { en: 'Cappuccino', fr: 'Cappuccino' }, price: '€4.00' },
+    { name: { en: 'Filter Coffee', fr: 'Café filtre' }, price: '€4.50' },
+    { name: { en: 'Flat White', fr: 'Flat White' }, price: '€5.00' },
+    { name: { en: 'Latte (Hot / Iced)', fr: 'Latte (Chaud / Glacé)' }, price: '€5.00 / €6.50' },
+    { name: { en: 'Cold Brew', fr: 'Cold Brew' }, price: '€5.00' },
+    { name: { en: 'Mocha / Chai / Matcha (Hot / Iced)', fr: 'Mocha / Chai / Matcha (Chaud / Glacé)' }, price: '€6.00 / €6.50' },
+    { name: { en: 'Hot Chocolate', fr: 'Chocolat chaud' }, price: '€6.00' },
+    { name: { en: 'Kombucha / Craft Beer', fr: 'Kombucha / Bière artisanale' }, price: '€5.00' },
+    { name: { en: 'Organic Juice / Tea', fr: 'Jus bio / Thé' }, price: '€4.50 / €4.00' },
+  ],
+  food: [
+    { name: { en: 'Butter Croissant', fr: 'Croissant au beurre' }, price: '€2.50' },
+    { name: { en: 'Pain au Chocolat', fr: 'Pain au chocolat' }, price: '€2.70' },
+    { name: { en: 'Clif Bar', fr: 'Barre énergétique Clif' }, price: '€3.50' },
+    { name: { en: 'Cookie of the Day', fr: 'Cookie du jour' }, price: '€4.00' },
+    { name: { en: 'Stuffed Croissant · Jam & Ricotta', fr: 'Croissant garni · Confiture & Ricotta' }, price: '€5.00' },
+    { name: { en: 'Stuffed Croissant · Ham & Cheddar', fr: 'Croissant garni · Jambon & Cheddar' }, price: '€7.00' },
+    { name: { en: 'Stuffed Croissant · Sundried Tomato & Goat Cheese', fr: 'Croissant garni · Tomate séchée & Chèvre' }, price: '€7.00' },
+    { name: { en: 'Fresh Granola Bowl', fr: 'Bol de granola frais' }, price: '€8.00' },
+  ],
+};
+
+export const STUDIO_SPACE = {
+  name: 'Le Peloton Studio — l’Échappée',
+  area: '80 m²',
+  capacity: { en: '~65 seated · 80+ standing', fr: '~65 assis · 80+ debout' },
+  location: { en: 'Ground floor, 3 doors down in Le Marais', fr: 'Rez-de-chaussée, à trois portes du café dans le Marais' },
+  features: {
+    en: [
+      '80 m² modular ground-floor space with automated divider wall',
+      'Welcome bar counter, private dressing room & specialty coffee catering',
+      'Trusted by Le Col, Zwift, ON Running, New Balance, Oatly & La Marzocco',
+    ],
+    fr: [
+      'Espace modulable de 80 m² en rez-de-chaussée avec cloison motorisée',
+      'Comptoir bar d’accueil, loge privée et service café de spécialité',
+      'Collaborations : Le Col, Zwift, ON Running, New Balance, Oatly & La Marzocco',
+    ],
+  },
+};
+
 export const I18N = {
   en: {
-    navStory: 'Our story',
-    navFleet: 'Fleet',
-    navClubhouse: 'Clubhouse',
+    navStory: 'Story',
+    navFleet: 'Rentals',
+    navTours: 'Tours',
+    navClub: 'Cycling Club',
+    navCafe: 'Café & Studio',
     bagLabel: 'Bag',
     heroKicker: '17 Rue du Pont Louis-Philippe · Le Marais',
     heroTitle: 'Coffee, community,\nand cycling in Paris.',
-    heroSub: 'Carbon road, gravel, city, and family bike rentals from the heart of the Marais—backed by our specialty coffee café, Cycling Club, and sister company Bike About Tours.',
-    heroCtaPrimary: 'Explore the fleet',
-    heroCtaSecondary: 'Our story',
+    heroSub: 'Carbon road, gravel, city, and family bike rentals, guided Bike About Tours, weekly Cycling Club rides, and specialty coffee from one Marais hub.',
+    heroCtaPrimary: 'Rent a bike',
+    heroCtaSecondary: 'Guided tours',
     fleetTitle: 'Choose your ride',
-    fleetMeta: 'Helmet & repair kit included · 20% French VAT incl.',
+    fleetMeta: 'Helmet & repair kit included · Live workshop inventory · 20% French VAT incl.',
     pickupDate: 'Pickup',
     pickupTime: 'Time',
     duration: 'Duration',
@@ -521,9 +688,9 @@ export const I18N = {
     halfDayUnit: 'for 4h',
     perDayUnit: '/day',
     inStock: (n) => `${n} ready`,
-    noneLeft: 'Reserved in bag',
+    noneLeft: 'Unavailable for window',
     configureBtn: 'Select & fit',
-    soldOutBtn: 'All in bag',
+    soldOutBtn: 'Unavailable',
     specsTitle: 'Spec & kit',
     sizeLabel: 'Frame size',
     pedalsLabel: 'Pedal setup for this bike',
@@ -534,49 +701,93 @@ export const I18N = {
     riderNamePlaceholder: 'Alex',
     modalTotal: 'Bike total',
     modalAdd: 'Add to bag',
+    toursEyebrow: 'Sister company · Bike About Tours',
+    toursTitle: 'Guided rides through Paris & Versailles',
+    toursMeta: 'Small groups led from Le Marais · Bikes, helmets & tickets included',
+    tourDateLabel: 'Tour date',
+    tourSlotLabel: 'Departure',
+    tourAdultsLabel: 'Adults',
+    tourKidsLabel: 'Youth (<18)',
+    tourRidersLabel: 'Group size',
+    tourSpotsLeft: (n) => `${n} spots open`,
+    tourPrivateOpen: 'Slot available',
+    tourSoldOut: 'Slot full',
+    tourAddBtn: 'Add tour to bag',
+    clubEyebrow: 'Weekly Road & Gravel · Mild · Medium · Spicy',
+    clubTitle: 'Le Peloton Cycling Club',
+    clubMeta: 'Departing 17 Rue du Pont Louis-Philippe · Select a ride date to view leaders, volunteer to lead, or book a rental bike.',
+    clubDateLabel: 'Ride date',
+    clubUpcomingLabel: 'Scheduled club dates',
+    clubLeaderInputLabel: 'Ride leader name',
+    clubLeaderPlaceholder: 'Choose or type your name',
+    clubSignUpBtn: 'Lead this group',
+    clubWithdrawBtn: 'Withdraw',
+    clubSignedBadge: 'Leading',
+    clubNeedLeader: 'Leader needed',
+    clubFullLeaders: '4/4 leaders',
+    clubRentForRide: 'Rent a bike for this ride',
+    clubNoLeadersYet: 'No leader assigned yet — sign up below',
+    cafeEyebrow: 'Specialty Coffee & Modular Event Space',
+    cafeTitle: 'In the cup & three doors down',
+    cafeMenuHeading: 'Specialty Coffee & Kitchen',
+    cafeDrinksHeading: 'Espresso, Filter & Cold Drinks',
+    cafeFoodHeading: 'Stuffed Croissants, Bowls & Pastries',
+    studioHeading: 'Le Peloton Studio — l’Échappée',
+    studioFormTitle: 'Book l’Échappée for a pop-up, press launch, or team event',
+    studioName: 'Your name / brand',
+    studioEmail: 'Work email',
+    studioDate: 'Preferred date',
+    studioGuests: 'Expected guests',
+    studioNotes: 'Tell us about your activation, ride, or hospitality needs',
+    studioSubmit: 'Send studio inquiry',
+    studioSent: 'Inquiry received — Tess & our events team will reply shortly.',
     dockAction: 'Open bag',
-    dockCount: (n) => `${n} bike${n > 1 ? 's' : ''}`,
-    bagTitle: 'Rental bag',
-    bagEmpty: 'Your bag is empty. Select a bike from the fleet above to fit size and pedals.',
-    bagPickup: 'Pickup',
+    dockCount: (n) => `${n} item${n > 1 ? 's' : ''}`,
+    bagTitle: 'Your Peloton bag',
+    bagEmpty: 'Your bag is empty. Add a fitted rental bike or guided Bike About Tour to check out.',
+    bagPickup: 'Rental pickup',
     bagReturn: 'Return',
     bagRemove: 'Remove',
     bagVat: (vat, net) => `Incl. 20% VAT (€${vat.toFixed(2)}) · €${net.toFixed(2)} net`,
     bagIdNote: 'Valid photo ID required at pickup · 17 Rue du Pont Louis-Philippe, 75004 Paris.',
-    handoffBtn: 'Pay on BRM (Stripe)',
-    guestBtn: 'Continue as guest',
-    backToBagBtn: 'Back',
+    checkoutProceedStripe: 'Checkout with Stripe',
+    checkoutProceedDirect: 'Reserve & lock inventory',
+    handoffBtn: 'Or open legacy BRM portal',
+    backToBagBtn: 'Back to bag',
     firstName: 'First name',
     lastName: 'Last name',
     email: 'Email',
-    phone: 'Phone (optional)',
+    phone: 'Phone (WhatsApp)',
     terms: 'I will bring a valid photo ID for pickup at Le Peloton Café.',
-    confirmBtn: 'Request reservation',
-    confirmedBadge: 'Reservation prepared',
-    confirmedTitle: 'Ready for your pickup window',
-    confirmedBody: 'Complete online payment on BRM now to lock workshop bike prep and pedals.',
-    editBagBtn: 'Edit bag',
+    confirmStripeBtn: 'Continue to Stripe payment',
+    confirmDirectBtn: 'Confirm reservation',
+    confirmedBadge: 'Confirmed',
+    confirmedTitle: 'Workshop & tour prep locked',
+    confirmedBody: 'Your reference is saved in Le Peloton’s morning prep board. Show your photo ID at 17 Rue du Pont Louis-Philippe.',
+    newBookingBtn: 'Start another booking',
     clubhouseEyebrow: 'Coffee · Community · Cycling',
     clubhouseTitle: 'Life in Paris is better together.',
     clubhouseBody: 'In the heart of the Marais, our café brings together cyclists back from morning rides, neighbourhood regulars, and travellers—just three doors down from Le Peloton Studio (l’Échappée).',
     clubhouseHoursTitle: 'Opening & rental hours',
     clubhouseHoursBody: 'Café: Mon–Fri 08:00–16:30 · Weekends 08:00–18:00 (rental pickups until 16:00 / 17:30)',
     clubhouseAddressTitle: 'Address',
-    clubhousePortalLink: 'Open live BRM portal',
+    staffLink: 'Staff Ops',
     close: 'Close',
   },
   fr: {
-    navStory: 'Notre histoire',
-    navFleet: 'La flotte',
-    navClubhouse: 'Le café',
+    navStory: 'Histoire',
+    navFleet: 'Locations',
+    navTours: 'Visites',
+    navClub: 'Cycling Club',
+    navCafe: 'Café & Studio',
     bagLabel: 'Panier',
     heroKicker: '17 Rue du Pont Louis-Philippe · Le Marais',
     heroTitle: 'Café, communauté\net vélo à Paris.',
-    heroSub: 'Location de vélos route, gravel, ville et famille au cœur du Marais—au départ de notre café de spécialité, du Cycling Club et de Bike About Tours.',
-    heroCtaPrimary: 'Voir les vélos',
-    heroCtaSecondary: 'Notre histoire',
+    heroSub: 'Locations route carbone, gravel, ville et famille, visites guidées Bike About Tours, sorties du Cycling Club et café de spécialité au cœur du Marais.',
+    heroCtaPrimary: 'Louer un vélo',
+    heroCtaSecondary: 'Visites guidées',
     fleetTitle: 'Choisissez votre vélo',
-    fleetMeta: 'Casque et kit réparation inclus · TVA 20 % incl.',
+    fleetMeta: 'Casque et kit réparation inclus · Stock atelier en direct · TVA 20 % incl.',
     pickupDate: 'Départ',
     pickupTime: 'Heure',
     duration: 'Durée',
@@ -588,9 +799,9 @@ export const I18N = {
     halfDayUnit: 'pour 4h',
     perDayUnit: '/jour',
     inStock: (n) => `${n} dispo${n > 1 ? 's' : ''}`,
-    noneLeft: 'Dans votre panier',
+    noneLeft: 'Indisponible sur ce créneau',
     configureBtn: 'Configurer',
-    soldOutBtn: 'Stock réservé',
+    soldOutBtn: 'Complet',
     specsTitle: 'Équipement',
     sizeLabel: 'Taille du cadre',
     pedalsLabel: 'Pédales pour ce vélo',
@@ -601,34 +812,77 @@ export const I18N = {
     riderNamePlaceholder: 'Alex',
     modalTotal: 'Total vélo',
     modalAdd: 'Ajouter au panier',
+    toursEyebrow: 'Société sœur · Bike About Tours',
+    toursTitle: 'Visites guidées à Paris & Versailles',
+    toursMeta: 'Petits groupes au départ du Marais · Vélos, casques et billets inclus',
+    tourDateLabel: 'Date de visite',
+    tourSlotLabel: 'Horaire',
+    tourAdultsLabel: 'Adultes',
+    tourKidsLabel: 'Jeunes (<18)',
+    tourRidersLabel: 'Participants',
+    tourSpotsLeft: (n) => `${n} places dispo`,
+    tourPrivateOpen: 'Créneau libre',
+    tourSoldOut: 'Complet',
+    tourAddBtn: 'Ajouter la visite',
+    clubEyebrow: 'Sorties Route & Gravel · Mild · Medium · Spicy',
+    clubTitle: 'Le Peloton Cycling Club',
+    clubMeta: 'Départ au 17 Rue du Pont Louis-Philippe · Choisissez une date pour voir les capitaines de route, encadrer un groupe ou louer un vélo.',
+    clubDateLabel: 'Date de sortie',
+    clubUpcomingLabel: 'Prochaines dates club',
+    clubLeaderInputLabel: 'Nom du Ride Leader',
+    clubLeaderPlaceholder: 'Choisissez ou tapez votre prénom',
+    clubSignUpBtn: 'Encadrer ce groupe',
+    clubWithdrawBtn: 'Se retirer',
+    clubSignedBadge: 'Inscrit',
+    clubNeedLeader: 'Leader recherché',
+    clubFullLeaders: '4/4 leaders',
+    clubRentForRide: 'Louer un vélo pour cette sortie',
+    clubNoLeadersYet: 'Aucun leader inscrit — rejoignez le groupe',
+    cafeEyebrow: 'Café de spécialité & Espace événementiel',
+    cafeTitle: 'Dans la tasse & à trois portes',
+    cafeMenuHeading: 'Carte du Café & Comptoir',
+    cafeDrinksHeading: 'Espresso, Filtre & Boissons fraîches',
+    cafeFoodHeading: 'Croissants garnis, Granola & Pâtisseries',
+    studioHeading: 'Le Peloton Studio — l’Échappée',
+    studioFormTitle: 'Privatiser l’Échappée (pop-up, lancement, séminaire)',
+    studioName: 'Nom / Marque',
+    studioEmail: 'E-mail professionnel',
+    studioDate: 'Date souhaitée',
+    studioGuests: 'Nombre d’invités',
+    studioNotes: 'Décrivez votre événement, sortie club ou besoin café',
+    studioSubmit: 'Envoyer la demande',
+    studioSent: 'Demande enregistrée — Tess et notre équipe vous répondent vite.',
     dockAction: 'Voir le panier',
-    dockCount: (n) => `${n} vélo${n > 1 ? 's' : ''}`,
-    bagTitle: 'Panier location',
-    bagEmpty: 'Votre panier est vide. Sélectionnez un vélo ci-dessus pour choisir la taille et les pédales.',
-    bagPickup: 'Retrait',
+    dockCount: (n) => `${n} article${n > 1 ? 's' : ''}`,
+    bagTitle: 'Votre panier Peloton',
+    bagEmpty: 'Votre panier est vide. Ajoutez un vélo configuré ou une visite guidée Bike About Tours.',
+    bagPickup: 'Retrait location',
     bagReturn: 'Retour',
+    bagRemove: 'Retirer',
     bagVat: (vat, net) => `Dont 20 % TVA (${vat.toFixed(2)} €) · ${net.toFixed(2)} € HT`,
     bagIdNote: 'Pièce d’identité demandée au retrait · 17 Rue du Pont Louis-Philippe, 75004 Paris.',
-    handoffBtn: 'Régler sur BRM (Stripe)',
-    guestBtn: 'Coordonnées invité',
-    backToBagBtn: 'Retour',
+    checkoutProceedStripe: 'Payer via Stripe',
+    checkoutProceedDirect: 'Réserver ce créneau',
+    handoffBtn: 'Ou ouvrir le portail BRM',
+    backToBagBtn: 'Retour au panier',
     firstName: 'Prénom',
     lastName: 'Nom',
     email: 'E-mail',
-    phone: 'Téléphone (optionnel)',
+    phone: 'Téléphone (WhatsApp)',
     terms: 'J’apporterai une pièce d’identité valide au Peloton Café.',
-    confirmBtn: 'Préparer la réservation',
-    confirmedBadge: 'Réservation prête',
-    confirmedTitle: 'Prêt pour votre créneau de retrait',
-    confirmedBody: 'Finalisez le règlement en ligne sur BRM pour bloquer la préparation atelier et vos pédales.',
-    editBagBtn: 'Modifier le panier',
+    confirmStripeBtn: 'Continuer vers Stripe',
+    confirmDirectBtn: 'Confirmer la réservation',
+    confirmedBadge: 'Confirmé',
+    confirmedTitle: 'Préparation atelier enregistrée',
+    confirmedBody: 'Votre référence figure sur le tableau atelier du Peloton Café. Présentez une pièce d’identité au 17 Rue du Pont Louis-Philippe.',
+    newBookingBtn: 'Nouvelle réservation',
     clubhouseEyebrow: 'Café · Communauté · Vélo',
     clubhouseTitle: 'Paris se vit mieux en peloton.',
     clubhouseBody: 'Au cœur du Marais, notre café réunit cyclistes de retour de sortie, habitués du quartier et voyageurs—à trois portes du Peloton Studio (l’Échappée).',
     clubhouseHoursTitle: 'Horaires du café & retraits',
     clubhouseHoursBody: 'Café : Lun–Ven 08:00–16:30 · Week-end 08:00–18:00 (retraits jusqu’à 16:00 / 17:30)',
     clubhouseAddressTitle: 'Adresse',
-    clubhousePortalLink: 'Boutique BRM en ligne',
+    staffLink: 'Espace Staff',
     close: 'Fermer',
   },
 };
@@ -641,6 +895,19 @@ export function computeBikePrice(bike, durationKey, customDays = 1) {
   if (bike.rates.tiers[days] != null) return bike.rates.tiers[days];
   const maxTier = Math.max(...Object.keys(bike.rates.tiers).map(Number));
   return bike.rates.tiers[maxTier] + (days - maxTier) * bike.rates.extraDay;
+}
+
+export function computeTourPrice(tour, adults = 1, kids = 0) {
+  if (!tour) return 0;
+  const a = Math.max(0, Math.min(16, Math.round(Number(adults) || 0)));
+  const k = Math.max(0, Math.min(16, Math.round(Number(kids) || 0)));
+  const totalRiders = a + k;
+  if (totalRiders <= 0) return 0;
+  if (tour.pricingType === 'private_group') {
+    const extra = Math.max(0, totalRiders - tour.includedRiders);
+    return tour.groupBasePrice + extra * tour.extraRiderPrice;
+  }
+  return a * tour.adultPrice + k * tour.childPrice;
 }
 
 export function computeVatBreakdown(grossTotal, vatRate = STORE.vatRate) {
@@ -665,21 +932,30 @@ export function getPickupSlots(dateStr) {
   return slots;
 }
 
-export function computeReturnInfo(dateStr, timeStr, durationKey, customDays = 1) {
+export function computeWindowMs(dateStr, timeStr, durationKey, customDays = 1) {
   const [y, m, d] = (dateStr || '').split('-').map(Number);
   const [hh, mm] = (timeStr || '09:00').split(':').map(Number);
-  if (!y || !m || !d) return { dateStr: '', timeStr: '' };
+  if (!y || !m || !d) return { startMs: 0, endMs: 0, dateStr: '', timeStr: '' };
   const startMs = Date.UTC(y, m - 1, d, hh || 0, mm || 0);
   const addMs =
     durationKey === '4h'
       ? 4 * 3600 * 1000
-      : Math.max(1, Math.min(30, Math.round(DURATION_PRESETS.find((p) => p.key === durationKey)?.days ?? customDays ?? 1))) *
+      : Math.max(
+          1,
+          Math.min(30, Math.round(DURATION_PRESETS.find((p) => p.key === durationKey)?.days ?? customDays ?? 1))
+        ) *
         24 *
         3600 *
         1000;
-  const end = new Date(startMs + addMs);
+  const endMs = startMs + addMs;
+  const end = new Date(endMs);
   const outDate = `${end.getUTCFullYear()}-${String(end.getUTCMonth() + 1).padStart(2, '0')}-${String(end.getUTCDate()).padStart(2, '0')}`;
   const outTime = `${String(end.getUTCHours()).padStart(2, '0')}:${String(end.getUTCMinutes()).padStart(2, '0')}`;
+  return { startMs, endMs, dateStr: outDate, timeStr: outTime };
+}
+
+export function computeReturnInfo(dateStr, timeStr, durationKey, customDays = 1) {
+  const { dateStr: outDate, timeStr: outTime } = computeWindowMs(dateStr, timeStr, durationKey, customDays);
   return { dateStr: outDate, timeStr: outTime };
 }
 
