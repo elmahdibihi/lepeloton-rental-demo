@@ -201,12 +201,13 @@ function renderKpis() {
     (sum, b) => sum + b.sizes.reduce((s2, sz) => s2 + sz.heldCount, 0),
     0
   );
+  const needsLeaderCount = ov.club.upcomingRides.filter((r) => (r.leaders || []).length === 0).length;
   const newInquiries = ov.studioInquiries.filter((i) => i.status === 'new').length;
 
   const items = [
     { label: 'Active Bookings', value: String(activeBookings.length) },
     { label: 'Bikes on Workshop Hold', value: String(heldTotal) },
-    { label: 'Club Groups Needing Leader', value: String(ov.club.needsLeaderCount) },
+    { label: 'Club Groups Needing Leader', value: String(needsLeaderCount) },
     { label: 'Open Studio Leads', value: String(newInquiries) },
   ];
 
@@ -480,6 +481,10 @@ function renderClubPanel() {
   saveNotesBtn.addEventListener('click', async () => {
     if (state.demoMode) {
       club.planningNotes.content = ta.value;
+      saveNotesBtn.textContent = 'Saved ✓';
+      setTimeout(() => {
+        saveNotesBtn.textContent = 'Save notes';
+      }, 1400);
       return;
     }
     const resp = await fetch('./api/admin/planning-notes', {
@@ -489,7 +494,8 @@ function renderClubPanel() {
     });
     if (resp.ok) {
       state.overview = (await resp.json()).overview;
-      renderDashboard();
+      saveNotesBtn.textContent = 'Saved ✓';
+      setTimeout(() => renderDashboard(), 900);
     }
   });
   notesCard.append(notesTitle, ta, saveNotesBtn);
@@ -549,8 +555,8 @@ function renderStudioPanel() {
 
     const statusBtn = document.createElement('button');
     statusBtn.type = 'button';
-    statusBtn.className = 'size-btn';
-    statusBtn.textContent = inq.status === 'new' ? 'Mark replied' : inq.status;
+    statusBtn.className = `size-btn${inq.status === 'replied' ? ' is-fit' : ''}`;
+    statusBtn.textContent = inq.status === 'new' ? 'Mark replied' : 'Replied ✓';
     statusBtn.addEventListener('click', async () => {
       const next = inq.status === 'new' ? 'replied' : 'new';
       if (state.demoMode) {
@@ -592,4 +598,5 @@ function renderDashboard() {
 
 el('adminRefreshBtn').addEventListener('click', loadOverview);
 window.addEventListener('resize', syncActiveTab);
+document.fonts?.ready?.then(syncActiveTab);
 loadOverview();

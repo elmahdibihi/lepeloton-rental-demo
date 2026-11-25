@@ -159,8 +159,17 @@ select {
   transition: opacity 160ms var(--ease-out);
 }
 
-.nav-links a:hover {
+.nav-links a:hover,
+.nav-links a.is-active {
   opacity: 1;
+}
+
+.nav-links a.is-active {
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--yellow);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
 }
 
 .nav-right {
@@ -2098,6 +2107,16 @@ select {
   color: var(--green);
   font-size: 13px;
   font-weight: 600;
+}
+
+.studio-sent.is-error {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.tour-add-btn.is-added {
+  background: #18794E;
+  color: #FFFFFF;
 }
 
 .admin-gate-body {

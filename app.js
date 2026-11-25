@@ -74,6 +74,7 @@ const state = {
   confirmedBooking: null,
   checkoutError: '',
   checkoutBusy: false,
+  recentTourAddedId: null,
   rollPrices: false,
   modal: {
     bikeId: null,
@@ -154,6 +155,7 @@ function renderGlidingSeg(container, options, activeVal, onSelect) {
     btn.setAttribute('aria-checked', String(opt.value === activeVal));
     btn.textContent = opt.label;
     btn.addEventListener('click', () => {
+      syncGlidingSegThumb(container, opt.value);
       meta.onSelect(opt.value);
       btn.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
     });
@@ -599,6 +601,7 @@ function syncDeckControls() {
     state.heightFilter,
     (val) => {
       state.heightFilter = val;
+      state.cardSizes = {};
       renderBikeGrid();
     }
   );
@@ -750,6 +753,10 @@ function renderToursSection() {
   for (const tour of TOURS) {
     const sel = state.tourSelections[tour.id];
     const spotsLeft = getTourSpotsRemaining(tour, sel.slot);
+    if (spotsLeft > 0 && tour.pricingType !== 'private_group' && sel.adults + sel.kids > spotsLeft) {
+      sel.kids = Math.max(0, Math.min(sel.kids, spotsLeft - 1));
+      sel.adults = Math.max(1, Math.min(sel.adults, spotsLeft - sel.kids));
+    }
     const totalRiders = sel.adults + sel.kids;
     const price = computeTourPrice(tour, sel.adults, sel.kids);
     const canBook =
@@ -885,9 +892,16 @@ function renderToursSection() {
 
     const addBtn = document.createElement('button');
     addBtn.type = 'button';
-    addBtn.className = 'btn-yellow tour-add-btn';
+    const justAdded = state.recentTourAddedId === tour.id;
+    addBtn.className = `btn-yellow tour-add-btn${justAdded ? ' is-added' : ''}`;
     addBtn.disabled = !canBook;
-    addBtn.textContent = canBook ? txt.tourAddBtn : txt.tourSoldOut;
+    addBtn.textContent = justAdded
+      ? state.lang === 'fr'
+        ? 'Ajouté au panier ✓'
+        : 'Added to bag ✓'
+      : canBook
+        ? txt.tourAddBtn
+        : txt.tourSoldOut;
     addBtn.addEventListener('click', () => {
       state.bag.push({
         uid: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -898,8 +912,15 @@ function renderToursSection() {
         adults: sel.adults,
         kids: sel.kids,
       });
+      state.recentTourAddedId = tour.id;
       renderToursSection();
       syncBagIndicators();
+      setTimeout(() => {
+        if (state.recentTourAddedId === tour.id) {
+          state.recentTourAddedId = null;
+          renderToursSection();
+        }
+      }, 1100);
     });
 
     body.append(top, desc, controls, addBtn);
@@ -1019,6 +1040,11 @@ function renderClubSection() {
     pillsWrap.appendChild(b);
   }
 
+  renderClubCards();
+}
+
+function renderClubCards() {
+  const txt = t();
   const grid = el('clubGrid');
   grid.replaceChildren();
 
@@ -1770,6 +1796,37 @@ function setupScrollChrome() {
     { threshold: 0.14 }
   );
   heroObserver.observe(hero);
+
+  const navMap = [
+    ['story', 'navStoryLink'],
+    ['fleet', 'navFleetLink'],
+    ['tours', 'navToursLink'],
+    ['club', 'navClubLink'],
+    ['cafe-studio', 'navCafeLink'],
+  ];
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        for (const [secId, linkId] of navMap) {
+          el(linkId)?.classList.toggle('is-active', secId === entry.target.id);
+        }
+      }
+    },
+    { rootMargin: '-28% 0px -56% 0px', threshold: 0.05 }
+  );
+  for (const [secId] of navMap) {
+    const sec = el(secId);
+    if (sec) sectionObserver.observe(sec);
+  }
+
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => {
+      for (const [container, meta] of segRegistry.entries()) {
+        syncGlidingSegThumb(container, meta.activeVal);
+      }
+    });
+  }
 }
 
 function renderAll() {
@@ -1823,6 +1880,7 @@ function bindEvents() {
 
   el('clubLeaderInput').addEventListener('input', (e) => {
     state.leaderName = e.target.value;
+    renderClubCards();
   });
 
   el('studioForm').addEventListener('submit', async (e) => {
@@ -1841,10 +1899,17 @@ function bindEvents() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!resp.ok) return;
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        msg.hidden = false;
+        msg.className = 'studio-sent is-error';
+        msg.textContent = errData.error || 'Please check your name and email.';
+        return;
+      }
     }
     e.target.reset();
     msg.hidden = false;
+    msg.className = 'studio-sent';
     msg.textContent = t().studioSent;
   });
 
