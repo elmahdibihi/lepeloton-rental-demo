@@ -170,7 +170,7 @@ async function buildStaticDemoOverview() {
 }
 
 async function loadOverview() {
-  try {
+  if (!window.location.hostname.endsWith('.github.io')) try {
     const resp = await fetch('./api/admin/overview', { headers: apiHeaders() });
     if (resp.status === 401) {
       window.location.href = './admin';

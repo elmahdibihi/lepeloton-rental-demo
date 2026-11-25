@@ -302,6 +302,12 @@ export function createPelotonApp(options = {}) {
         });
       }
 
+      if (req.method === 'GET' && pathname === '/favicon.ico') {
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+
       if (req.method === 'GET' && PUBLIC_FILES.has(pathname)) {
         const entry = PUBLIC_FILES.get(pathname);
         const abs = path.join(__dirname, entry.file);

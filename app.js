@@ -311,7 +311,8 @@ function buildStaticRidesForDate(seed, dateStr) {
 
 async function loadInitialBackendOrStatic() {
   const today = parisDateOffset(0);
-  try {
+  const isStaticPagesHost = window.location.hostname.endsWith('.github.io');
+  if (!isStaticPagesHost) try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 2200);
     const qs = new URLSearchParams({
