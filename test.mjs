@@ -256,6 +256,39 @@ await withServer(
     ).json();
     assert.equal(adminOv.bookings.length, 1);
     assert.equal(adminOv.studioInquiries.length, 1);
+    assert.equal(adminOv.finance.confirmedGrossCents, (70 + 5 + 5 + 90) * 100);
+    assert.equal(adminOv.finance.rentalsGrossCents, 80 * 100);
+    assert.equal(adminOv.finance.toursGrossCents, 90 * 100);
+    assert.ok(adminOv.events.length >= 2);
+
+    const fulfillRes = await (
+      await fetch(`${baseUrl}/api/admin/bookings/${adminOv.bookings[0].id}/fulfillment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-organizer-key': 'test-org-secret-1234' },
+        body: JSON.stringify({ fulfillment_status: 'picked_up' }),
+      })
+    ).json();
+    assert.equal(fulfillRes.overview.finance.bikesOutNow, 1);
+
+    const finCsv = await fetch(`${baseUrl}/api/admin/finance/export.csv`, {
+      headers: { 'x-organizer-key': 'test-org-secret-1234' },
+    });
+    assert.equal(finCsv.status, 200);
+    assert.ok((await finCsv.text()).startsWith('Ref,Created,Customer,Email,Status,Fulfillment'));
+
+    const evCreate = await fetch(`${baseUrl}/api/admin/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-organizer-key': 'test-org-secret-1234' },
+      body: JSON.stringify({
+        event_date: futureDate,
+        start_time: '18:30',
+        title: 'Oatly Latte Art Throwdown',
+        location: 'Studio l’Échappée',
+        visibility: 'public',
+        expected_guests: 70,
+      }),
+    });
+    assert.equal(evCreate.status, 201);
   }
 );
 

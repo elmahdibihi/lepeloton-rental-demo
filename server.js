@@ -242,12 +242,76 @@ function buildAdminOverview(db, leaderKey) {
 
   const studioInquiries = db.prepare('SELECT * FROM studio_inquiries ORDER BY id DESC LIMIT 40').all();
   const recentActivity = db.prepare('SELECT * FROM activity_log ORDER BY id DESC LIMIT 15').all();
+  const events = db.prepare('SELECT * FROM events ORDER BY event_date ASC, start_time ASC').all();
+
+  let confirmedGrossCents = 0;
+  let confirmedVatCents = 0;
+  let pendingGrossCents = 0;
+  let rentalsGrossCents = 0;
+  let rentalsCount = 0;
+  let toursGrossCents = 0;
+  let toursCount = 0;
+  let confirmedCount = 0;
+  let bikesOutNow = 0;
+  let pickupsToday = 0;
+  const revenueByItem = new Map();
+
+  for (const b of bookings) {
+    if (b.status === 'pending_payment') {
+      pendingGrossCents += b.total_cents;
+      continue;
+    }
+    if (b.status !== 'confirmed') continue;
+    confirmedCount += 1;
+    confirmedGrossCents += b.total_cents;
+    confirmedVatCents += b.vat_cents;
+    if (b.fulfillment_status === 'picked_up') {
+      bikesOutNow += b.bikes.length;
+    }
+    for (const bk of b.bikes) {
+      rentalsCount += 1;
+      rentalsGrossCents += bk.price_cents;
+      if (bk.pickup_date === today) pickupsToday += 1;
+      const bikeObj = BIKES.find((x) => x.id === bk.bike_id);
+      const key = `Bike: ${bikeObj?.name || bk.bike_id}`;
+      const cur = revenueByItem.get(key) || { name: key, count: 0, grossCents: 0 };
+      cur.count += 1;
+      cur.grossCents += bk.price_cents;
+      revenueByItem.set(key, cur);
+    }
+    for (const tr of b.tours) {
+      toursCount += 1;
+      toursGrossCents += tr.price_cents;
+      const tourObj = TOURS.find((x) => x.id === tr.tour_id);
+      const key = `Tour: ${tourObj?.name.en || tr.tour_id}`;
+      const cur = revenueByItem.get(key) || { name: key, count: 0, grossCents: 0 };
+      cur.count += tr.adults + tr.kids;
+      cur.grossCents += tr.price_cents;
+      revenueByItem.set(key, cur);
+    }
+  }
 
   return {
     today,
     leaderPortalPath: `/leaders?key=${encodeURIComponent(leaderKey)}`,
     bookings,
     fleet,
+    finance: {
+      confirmedCount,
+      confirmedGrossCents,
+      confirmedNetCents: confirmedGrossCents - confirmedVatCents,
+      confirmedVatCents,
+      pendingGrossCents,
+      rentalsGrossCents,
+      rentalsCount,
+      toursGrossCents,
+      toursCount,
+      avgOrderCents: confirmedCount ? Math.round(confirmedGrossCents / confirmedCount) : 0,
+      bikesOutNow,
+      pickupsToday,
+      byItem: [...revenueByItem.values()].sort((a, b) => b.grossCents - a.grossCents),
+    },
+    events,
     club: {
       upcomingRides: upcomingRides.slice(0, 24),
       needsLeaderCount: upcomingRides.filter((r) => r.leaders.length === 0).length,
@@ -886,12 +950,21 @@ export function createPelotonApp(options = {}) {
             )
             .all(today);
           const defaultDate = upcomingDates[0]?.ride_date || today;
+          const planningNotes = db.prepare('SELECT content, updated_at FROM planning_notes WHERE id = 1').get() || {
+            content: '',
+            updated_at: '',
+          };
+          const events = db
+            .prepare("SELECT * FROM events WHERE event_date >= ? AND status != 'cancelled' ORDER BY event_date ASC LIMIT 8")
+            .all(today);
           return sendJson(res, 200, {
             today,
             leaders,
             upcomingDates,
             date: defaultDate,
             rides: ensureDraftDate(db, defaultDate, 'leader-portal'),
+            planningNotes,
+            events,
           });
         }
 
@@ -1143,6 +1216,113 @@ export function createPelotonApp(options = {}) {
             return sendJson(res, 400, { error: 'Invalid status.' });
           }
           db.prepare('UPDATE bookings SET status = ?, updated_at = ? WHERE id = ?').run(status, nowIso(), id);
+          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db, leaderKey) });
+        }
+
+        const bookingFulfillMatch = pathname.match(/^\/api\/admin\/bookings\/(\d+)\/fulfillment$/);
+        if (req.method === 'POST' && bookingFulfillMatch) {
+          const id = Number(bookingFulfillMatch[1]);
+          const body = await readJsonBody(req);
+          const fulfillment = String(body.fulfillment_status || '');
+          if (!['scheduled', 'picked_up', 'returned'].includes(fulfillment)) {
+            return sendJson(res, 400, { error: 'Invalid fulfillment status.' });
+          }
+          db.prepare('UPDATE bookings SET fulfillment_status = ?, updated_at = ? WHERE id = ?').run(
+            fulfillment,
+            nowIso(),
+            id
+          );
+          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db, leaderKey) });
+        }
+
+        if (req.method === 'GET' && pathname === '/api/admin/finance/export.csv') {
+          const ov = buildAdminOverview(db, leaderKey);
+          const header = [
+            'Ref',
+            'Created',
+            'Customer',
+            'Email',
+            'Status',
+            'Fulfillment',
+            'Bikes',
+            'Tours',
+            'Net EUR',
+            'VAT 20% EUR',
+            'Gross EUR',
+          ];
+          const lines = [
+            header.join(','),
+            ...ov.bookings.map((b) =>
+              [
+                b.ref_code,
+                b.created_at.slice(0, 10),
+                b.customer_name,
+                b.customer_email,
+                b.status,
+                b.fulfillment_status || 'scheduled',
+                b.bikes.length,
+                b.tours.length,
+                ((b.total_cents - b.vat_cents) / 100).toFixed(2),
+                (b.vat_cents / 100).toFixed(2),
+                (b.total_cents / 100).toFixed(2),
+              ]
+                .map(csvCell)
+                .join(',')
+            ),
+          ];
+          res.writeHead(200, {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': 'attachment; filename="lepeloton-finance-ledger.csv"',
+            'Cache-Control': 'no-store',
+          });
+          res.end(lines.join('\r\n'));
+          return;
+        }
+
+        if (req.method === 'POST' && pathname === '/api/admin/events') {
+          const body = await readJsonBody(req);
+          const eventDate = String(body.event_date || '').trim();
+          const title = normalizeName(body.title, 100);
+          if (!isValidDateStr(eventDate) || title.length < 2) {
+            return sendJson(res, 400, { error: 'Valid event date and title required.' });
+          }
+          const ts = nowIso();
+          db.prepare(`
+            INSERT INTO events (event_date, start_time, title, location, visibility, expected_guests, notes, status, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'scheduled', ?, ?)
+          `).run(
+            eventDate,
+            normalizeName(body.start_time, 16),
+            title,
+            normalizeName(body.location || 'Studio l’Échappée', 60),
+            body.visibility === 'internal' ? 'internal' : 'public',
+            Math.max(0, Math.min(500, Math.round(Number(body.expected_guests) || 0))),
+            normalizeName(body.notes, 400),
+            ts,
+            ts
+          );
+          return sendJson(res, 201, { ok: true, overview: buildAdminOverview(db, leaderKey) });
+        }
+
+        const eventMatch = pathname.match(/^\/api\/admin\/events\/(\d+)$/);
+        if (eventMatch && req.method === 'PATCH') {
+          const id = Number(eventMatch[1]);
+          const body = await readJsonBody(req);
+          const existing = db.prepare('SELECT * FROM events WHERE id = ?').get(id);
+          if (!existing) return sendJson(res, 404, { error: 'Event not found.' });
+          db.prepare(
+            'UPDATE events SET status = ?, visibility = ?, updated_at = ? WHERE id = ?'
+          ).run(
+            ['scheduled', 'cancelled'].includes(body.status) ? body.status : existing.status,
+            ['public', 'internal'].includes(body.visibility) ? body.visibility : existing.visibility,
+            nowIso(),
+            id
+          );
+          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db, leaderKey) });
+        }
+
+        if (eventMatch && req.method === 'DELETE') {
+          db.prepare('DELETE FROM events WHERE id = ?').run(Number(eventMatch[1]));
           return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db, leaderKey) });
         }
 

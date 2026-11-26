@@ -28,6 +28,8 @@ const state = {
   upcomingDates: [],
   rides: [],
   myRides: [],
+  planningNotes: '',
+  events: [],
   seedCache: null,
 };
 
@@ -283,6 +285,23 @@ function renderCards() {
     desc.textContent = meta.detail.en;
     top.append(badgeRow, h3, desc);
 
+    if (ride.route_name || ride.notes) {
+      const noteLine = document.createElement('p');
+      noteLine.className = 'admin-sub';
+      noteLine.style.margin = '6px 0 0';
+      if (ride.route_url) {
+        const a = document.createElement('a');
+        a.href = ride.route_url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = ride.route_name || 'View route ↗';
+        noteLine.appendChild(a);
+      } else {
+        noteLine.textContent = [ride.route_name, ride.notes].filter(Boolean).join(' · ');
+      }
+      top.appendChild(noteLine);
+    }
+
     const leaderBox = document.createElement('div');
     leaderBox.className = 'club-leaders-box';
     const statusLine = document.createElement('div');
@@ -365,6 +384,45 @@ function renderAll() {
 
   renderMyRides();
   renderCards();
+  renderBulletin();
+}
+
+function renderBulletin() {
+  const sec = el('leaderBulletin');
+  const body = el('leaderBulletinBody');
+  body.replaceChildren();
+
+  if (!state.planningNotes && state.events.length === 0) {
+    sec.hidden = true;
+    return;
+  }
+  sec.hidden = false;
+
+  if (state.events.length > 0) {
+    const evWrap = document.createElement('div');
+    evWrap.className = 'admin-list';
+    for (const ev of state.events) {
+      const row = document.createElement('div');
+      row.className = 'my-ride-pill';
+      const info = document.createElement('div');
+      const strong = document.createElement('strong');
+      strong.textContent = `${ev.event_date}${ev.start_time ? ` · ${ev.start_time}` : ''} — ${ev.title}`;
+      const sub = document.createElement('span');
+      sub.className = 'admin-sub';
+      sub.textContent = `${ev.location}${ev.notes ? ` · ${ev.notes}` : ''}`;
+      info.append(strong, sub);
+      row.appendChild(info);
+      evWrap.appendChild(row);
+    }
+    body.appendChild(evWrap);
+  }
+
+  if (state.planningNotes) {
+    const pre = document.createElement('div');
+    pre.className = 'bulletin-notes';
+    pre.textContent = state.planningNotes;
+    body.appendChild(pre);
+  }
 }
 
 async function boot() {
@@ -383,6 +441,8 @@ async function boot() {
         state.upcomingDates = data.upcomingDates || [];
         state.date = data.date || data.today;
         state.rides = data.rides || [];
+        state.planningNotes = data.planningNotes?.content || '';
+        state.events = data.events || [];
         el('leaderModePill').textContent = 'Live SQLite';
         if (state.selectedLeader && !state.leaders.some((l) => l.toLowerCase() === state.selectedLeader.toLowerCase())) {
           state.selectedLeader = '';
@@ -414,6 +474,11 @@ async function boot() {
       state.date = upcoming[0]?.ride_date || state.today;
       state.rides = buildStaticRidesForDate(state.date);
       state.myRides = computeStaticMyRides();
+      state.planningNotes = seed.planning_notes || '';
+      state.events = [
+        { event_date: '2026-12-15', start_time: '19:00', title: 'Le Peloton Christmas Party', location: 'Studio l’Échappée', notes: 'Annual club & café holiday gathering' },
+        { event_date: '2026-12-24', start_time: '08:00', title: 'Café Closed (Christmas Eve & Day)', location: 'Café', notes: 'Closed Dec 24 & Dec 25' },
+      ];
     }
   } catch {}
   renderAll();

@@ -6,6 +6,7 @@ const keyParam = urlParams.get('key') || '';
 
 const state = {
   tab: 'prep',
+  prepFilter: 'all',
   demoMode: false,
   overview: null,
 };
@@ -29,9 +30,10 @@ function renderTabSeg() {
   const container = el('adminTabSeg');
   const tabs = [
     { value: 'prep', label: 'Morning Prep' },
+    { value: 'finance', label: 'Revenue & Finance' },
+    { value: 'events', label: 'Events & Studio' },
     { value: 'workshop', label: 'Workshop Stock' },
     { value: 'club', label: 'Cycling Club' },
-    { value: 'studio', label: 'Studio Inquiries' },
   ];
 
   if (!segBase) {
@@ -84,9 +86,75 @@ function syncActiveTab() {
   }
 
   el('panelPrep').hidden = state.tab !== 'prep';
+  el('panelFinance').hidden = state.tab !== 'finance';
+  el('panelEvents').hidden = state.tab !== 'events';
   el('panelWorkshop').hidden = state.tab !== 'workshop';
   el('panelClub').hidden = state.tab !== 'club';
-  el('panelStudio').hidden = state.tab !== 'studio';
+}
+
+function computeDemoFinance(bookings, today) {
+  let confirmedCount = 0;
+  let confirmedGrossCents = 0;
+  let confirmedVatCents = 0;
+  let pendingGrossCents = 0;
+  let rentalsGrossCents = 0;
+  let rentalsCount = 0;
+  let toursGrossCents = 0;
+  let toursCount = 0;
+  let bikesOutNow = 0;
+  let pickupsToday = 0;
+  const byItem = new Map();
+
+  for (const b of bookings) {
+    if (b.status === 'pending_payment') {
+      pendingGrossCents += b.total_cents;
+      continue;
+    }
+    if (b.status !== 'confirmed') continue;
+    confirmedCount += 1;
+    confirmedGrossCents += b.total_cents;
+    confirmedVatCents += b.vat_cents || Math.round(b.total_cents - b.total_cents / 1.2);
+    if (b.fulfillment_status === 'picked_up') bikesOutNow += (b.bikes || []).length;
+    for (const bk of b.bikes || []) {
+      rentalsCount += 1;
+      const price = bk.price_cents || 7500;
+      rentalsGrossCents += price;
+      if (bk.pickup_date === today) pickupsToday += 1;
+      const bikeObj = BIKES.find((x) => x.id === bk.bike_id);
+      const key = `Bike: ${bikeObj?.name || bk.bike_id}`;
+      const cur = byItem.get(key) || { name: key, count: 0, grossCents: 0 };
+      cur.count += 1;
+      cur.grossCents += price;
+      byItem.set(key, cur);
+    }
+    for (const tr of b.tours || []) {
+      toursCount += 1;
+      const price = tr.price_cents || 9000;
+      toursGrossCents += price;
+      const tourObj = TOURS.find((x) => x.id === tr.tour_id);
+      const key = `Tour: ${tourObj?.name.en || tr.tour_id}`;
+      const cur = byItem.get(key) || { name: key, count: 0, grossCents: 0 };
+      cur.count += tr.adults + (tr.kids || 0);
+      cur.grossCents += price;
+      byItem.set(key, cur);
+    }
+  }
+
+  return {
+    confirmedCount,
+    confirmedGrossCents,
+    confirmedNetCents: confirmedGrossCents - confirmedVatCents,
+    confirmedVatCents,
+    pendingGrossCents,
+    rentalsGrossCents,
+    rentalsCount,
+    toursGrossCents,
+    toursCount,
+    avgOrderCents: confirmedCount ? Math.round(confirmedGrossCents / confirmedCount) : 0,
+    bikesOutNow,
+    pickupsToday,
+    byItem: [...byItem.values()].sort((a, b) => b.grossCents - a.grossCents),
+  };
 }
 
 async function buildStaticDemoOverview() {
@@ -101,40 +169,72 @@ async function buildStaticDemoOverview() {
     .slice(0, 15)
     .map((r, i) => ({ ...r, id: i + 1, effective_status: r.status || 'open' }));
 
+  const bookings = [
+    {
+      id: 1,
+      ref_code: 'LPC-9F42A1',
+      status: 'confirmed',
+      fulfillment_status: 'scheduled',
+      customer_name: 'Claire Moreau',
+      customer_email: 'claire@example.com',
+      customer_phone: '+33 6 12 34 56 78',
+      total_cents: 17000,
+      vat_cents: 2833,
+      created_at: `${today}T08:15:00Z`,
+      bikes: [
+        {
+          bike_id: '5474683819393024',
+          size_code: 'M',
+          pedal_id: 'spd_sl',
+          extras: ['garmin_mount'],
+          rider_name: 'Claire',
+          pickup_date: today,
+          pickup_time: '08:30',
+          return_date: today,
+          return_time: '18:00',
+          price_cents: 8000,
+        },
+      ],
+      tours: [
+        {
+          tour_id: 'hidden_paris',
+          tour_date: today,
+          tour_time: '14:30',
+          adults: 2,
+          kids: 0,
+          price_cents: 9000,
+        },
+      ],
+    },
+  ];
+
   return {
     today,
     leaderPortalPath: './leaders.html?demo=1',
-    bookings: [
+    bookings,
+    finance: computeDemoFinance(bookings, today),
+    events: [
       {
         id: 1,
-        ref_code: 'LPC-9F42A1',
-        status: 'confirmed',
-        customer_name: 'Claire Moreau',
-        customer_email: 'claire@example.com',
-        customer_phone: '+33 6 12 34 56 78',
-        total_cents: 16500,
-        bikes: [
-          {
-            bike_id: '5474683819393024',
-            size_code: 'M',
-            pedal_id: 'spd_sl',
-            extras: ['garmin_mount'],
-            rider_name: 'Claire',
-            pickup_date: today,
-            pickup_time: '08:30',
-            return_date: today,
-            return_time: '18:00',
-          },
-        ],
-        tours: [
-          {
-            tour_id: 'hidden_paris',
-            tour_date: today,
-            tour_time: '14:30',
-            adults: 2,
-            kids: 0,
-          },
-        ],
+        event_date: '2026-12-15',
+        start_time: '19:00',
+        title: 'Le Peloton Christmas Party',
+        location: 'Studio l’Échappée',
+        visibility: 'public',
+        expected_guests: 80,
+        notes: 'Annual club & café holiday gathering three doors down.',
+        status: 'scheduled',
+      },
+      {
+        id: 2,
+        event_date: '2026-12-24',
+        start_time: '08:00',
+        title: 'Café Closed (Christmas Eve & Day)',
+        location: 'Café',
+        visibility: 'public',
+        expected_guests: 0,
+        notes: 'Closed Dec 24 & Dec 25.',
+        status: 'scheduled',
       },
     ],
     fleet: BIKES.map((b) => ({
@@ -172,20 +272,22 @@ async function buildStaticDemoOverview() {
 }
 
 async function loadOverview() {
-  if (!window.location.hostname.endsWith('.github.io')) try {
-    const resp = await fetch('./api/admin/overview', { headers: apiHeaders() });
-    if (resp.status === 401) {
-      window.location.href = './admin';
-      return;
-    }
-    if (resp.ok) {
-      state.demoMode = false;
-      state.overview = await resp.json();
-      el('adminStatusPill').textContent = 'Live SQLite';
-      renderDashboard();
-      return;
-    }
-  } catch {}
+  if (!window.location.hostname.endsWith('.github.io')) {
+    try {
+      const resp = await fetch('./api/admin/overview', { headers: apiHeaders() });
+      if (resp.status === 401) {
+        window.location.href = './admin';
+        return;
+      }
+      if (resp.ok) {
+        state.demoMode = false;
+        state.overview = await resp.json();
+        el('adminStatusPill').textContent = 'Live SQLite';
+        renderDashboard();
+        return;
+      }
+    } catch {}
+  }
 
   state.demoMode = true;
   el('adminStatusPill').textContent = 'Static Preview Mode';
@@ -195,22 +297,40 @@ async function loadOverview() {
 
 function renderKpis() {
   const ov = state.overview;
+  if (state.demoMode) ov.finance = computeDemoFinance(ov.bookings, ov.today);
+  const fin = ov.finance;
   const wrap = el('adminKpis');
   wrap.replaceChildren();
 
-  const activeBookings = ov.bookings.filter((b) => b.status !== 'cancelled');
   const heldTotal = ov.fleet.reduce(
     (sum, b) => sum + b.sizes.reduce((s2, sz) => s2 + sz.heldCount, 0),
     0
   );
   const needsLeaderCount = ov.club.upcomingRides.filter((r) => (r.leaders || []).length === 0).length;
+  const scheduledEvents = (ov.events || []).filter((e) => e.status === 'scheduled').length;
   const newInquiries = ov.studioInquiries.filter((i) => i.status === 'new').length;
 
   const items = [
-    { label: 'Active Bookings', value: String(activeBookings.length) },
-    { label: 'Bikes on Workshop Hold', value: String(heldTotal) },
-    { label: 'Club Groups Needing Leader', value: String(needsLeaderCount) },
-    { label: 'Open Studio Leads', value: String(newInquiries) },
+    {
+      label: 'Confirmed Revenue',
+      value: fmtEuroCents(fin.confirmedGrossCents),
+      sub: `${fmtEuroCents(fin.confirmedNetCents)} net · ${fmtEuroCents(fin.confirmedVatCents)} VAT`,
+    },
+    {
+      label: 'Bikes Rented / Out',
+      value: `${fin.rentalsCount} (${fin.bikesOutNow} out)`,
+      sub: `${fin.pickupsToday} pickups today · ${heldTotal} in workshop`,
+    },
+    {
+      label: 'Upcoming Events & Leads',
+      value: `${scheduledEvents} / ${newInquiries}`,
+      sub: `${scheduledEvents} scheduled · ${newInquiries} new studio leads`,
+    },
+    {
+      label: 'Club Groups Needing Leader',
+      value: String(needsLeaderCount),
+      sub: `${ov.club.leaders.length} vetted leaders on roster`,
+    },
   ];
 
   for (const item of items) {
@@ -220,7 +340,10 @@ function renderKpis() {
     sp.textContent = item.label;
     const st = document.createElement('strong');
     st.textContent = item.value;
-    card.append(sp, st);
+    const sub = document.createElement('small');
+    sub.className = 'admin-sub';
+    sub.textContent = item.sub;
+    card.append(sp, st, sub);
     wrap.appendChild(card);
   }
 }
@@ -228,12 +351,37 @@ function renderKpis() {
 function renderPrepPanel() {
   const panel = el('panelPrep');
   panel.replaceChildren();
-  const bookings = state.overview.bookings;
+
+  const filterBar = document.createElement('div');
+  filterBar.className = 'size-pills';
+  filterBar.style.marginBottom = '14px';
+  for (const [val, label] of [
+    ['all', 'All bookings'],
+    ['scheduled', 'Awaiting pickup'],
+    ['picked_up', 'Out on road'],
+    ['returned', 'Returned'],
+  ]) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = `size-btn${state.prepFilter === val ? ' is-selected' : ''}`;
+    b.textContent = label;
+    b.addEventListener('click', () => {
+      state.prepFilter = val;
+      renderPrepPanel();
+    });
+    filterBar.appendChild(b);
+  }
+  panel.appendChild(filterBar);
+
+  const bookings = state.overview.bookings.filter((b) => {
+    if (state.prepFilter === 'all') return true;
+    return b.status !== 'cancelled' && (b.fulfillment_status || 'scheduled') === state.prepFilter;
+  });
 
   if (bookings.length === 0) {
     const p = document.createElement('p');
     p.className = 'fleet-meta';
-    p.textContent = 'No reservations yet. Bookings from the storefront appear here immediately.';
+    p.textContent = 'No reservations match this filter.';
     panel.appendChild(p);
     return;
   }
@@ -261,8 +409,42 @@ function renderPrepPanel() {
     const statusBadge = document.createElement('span');
     statusBadge.className = `status-pill is-${b.status}`;
     statusBadge.textContent = b.status.replace('_', ' ');
+
+    const fulfill = b.fulfillment_status || 'scheduled';
+    const fulfillBadge = document.createElement('span');
+    fulfillBadge.className = `fulfill-pill is-${fulfill}`;
+    fulfillBadge.textContent = fulfill === 'picked_up' ? 'Out now' : fulfill === 'returned' ? 'Returned' : 'Scheduled';
+
     const amt = document.createElement('strong');
     amt.textContent = fmtEuroCents(b.total_cents);
+
+    if (b.status === 'confirmed') {
+      const nextFulfill = fulfill === 'scheduled' ? 'picked_up' : fulfill === 'picked_up' ? 'returned' : 'scheduled';
+      const fulfillBtn = document.createElement('button');
+      fulfillBtn.type = 'button';
+      fulfillBtn.className = 'size-btn is-selected';
+      fulfillBtn.textContent =
+        fulfill === 'scheduled' ? 'Check out' : fulfill === 'picked_up' ? 'Mark returned' : 'Reopen';
+      fulfillBtn.addEventListener('click', async () => {
+        if (state.demoMode) {
+          b.fulfillment_status = nextFulfill;
+          renderDashboard();
+          return;
+        }
+        const resp = await fetch(`./api/admin/bookings/${b.id}/fulfillment`, {
+          method: 'POST',
+          headers: apiHeaders(),
+          body: JSON.stringify({ fulfillment_status: nextFulfill }),
+        });
+        if (resp.ok) {
+          state.overview = (await resp.json()).overview;
+          renderDashboard();
+        }
+      });
+      right.append(statusBadge, fulfillBadge, amt, fulfillBtn);
+    } else {
+      right.append(statusBadge, amt);
+    }
 
     const toggleBtn = document.createElement('button');
     toggleBtn.type = 'button';
@@ -286,7 +468,7 @@ function renderPrepPanel() {
       }
     });
 
-    right.append(statusBadge, amt, toggleBtn);
+    right.appendChild(toggleBtn);
     head.append(left, right);
 
     const lines = document.createElement('ul');
@@ -313,6 +495,365 @@ function renderPrepPanel() {
     stack.appendChild(card);
   }
   panel.appendChild(stack);
+}
+
+function renderFinancePanel() {
+  const panel = el('panelFinance');
+  panel.replaceChildren();
+  const fin = state.overview.finance;
+
+  const topBar = document.createElement('div');
+  topBar.className = 'admin-row-card admin-club-bar';
+  const barHead = document.createElement('div');
+  barHead.className = 'admin-row-head';
+  const titleWrap = document.createElement('div');
+  const h3 = document.createElement('h3');
+  h3.className = 'bike-name';
+  h3.textContent = 'Revenue, French VAT (20%) & Accounting Export';
+  const sub = document.createElement('span');
+  sub.className = 'admin-sub';
+  sub.textContent = `Confirmed orders: ${fin.confirmedCount} · Average basket: ${fmtEuroCents(fin.avgOrderCents)} · Pending checkout: ${fmtEuroCents(fin.pendingGrossCents)}`;
+  titleWrap.append(h3, sub);
+
+  const expBtn = document.createElement('button');
+  expBtn.type = 'button';
+  expBtn.className = 'btn-yellow';
+  expBtn.textContent = 'Export Accounting CSV';
+  expBtn.addEventListener('click', async () => {
+    if (!state.demoMode) {
+      const resp = await fetch('./api/admin/finance/export.csv', { headers: apiHeaders() });
+      if (!resp.ok) return;
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lepeloton-finance-ledger.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      return;
+    }
+    const lines = [
+      'Ref,Customer,Status,Net EUR,VAT 20% EUR,Gross EUR',
+      ...state.overview.bookings.map(
+        (b) =>
+          `${b.ref_code},"${b.customer_name}",${b.status},${((b.total_cents - b.vat_cents) / 100).toFixed(2)},${(
+            b.vat_cents / 100
+          ).toFixed(2)},${(b.total_cents / 100).toFixed(2)}`
+      ),
+    ];
+    const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'lepeloton-finance-ledger.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  barHead.append(titleWrap, expBtn);
+  topBar.appendChild(barHead);
+  panel.appendChild(topBar);
+
+  const grid = document.createElement('div');
+  grid.className = 'cafe-studio-grid';
+
+  const streamsCard = document.createElement('div');
+  streamsCard.className = 'admin-row-card';
+  const sTitle = document.createElement('h3');
+  sTitle.className = 'bike-name';
+  sTitle.textContent = 'Revenue Streams (EUR)';
+  const sDl = document.createElement('dl');
+  sDl.className = 'ledger-list';
+  for (const [k, v] of [
+    [`Bike Rentals (${fin.rentalsCount} bikes)`, fmtEuroCents(fin.rentalsGrossCents)],
+    [`Guided Bike About Tours (${fin.toursCount} bookings)`, fmtEuroCents(fin.toursGrossCents)],
+    ['Net Revenue (Excl. VAT)', fmtEuroCents(fin.confirmedNetCents)],
+    ['French VAT Collected (20%)', fmtEuroCents(fin.confirmedVatCents)],
+    ['Total Confirmed Gross', fmtEuroCents(fin.confirmedGrossCents)],
+  ]) {
+    const row = document.createElement('div');
+    row.className = 'ledger-row';
+    const dt = document.createElement('dt');
+    dt.textContent = k;
+    const dd = document.createElement('dd');
+    dd.textContent = v;
+    row.append(dt, dd);
+    sDl.appendChild(row);
+  }
+  streamsCard.append(sTitle, sDl);
+
+  const itemsCard = document.createElement('div');
+  itemsCard.className = 'admin-row-card';
+  const iTitle = document.createElement('h3');
+  iTitle.className = 'bike-name';
+  iTitle.textContent = 'Top Performing Bikes & Tours';
+  const iDl = document.createElement('dl');
+  iDl.className = 'ledger-list';
+  if (fin.byItem.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'admin-sub';
+    empty.textContent = 'Confirmed bookings will break down by bike model and tour here.';
+    itemsCard.append(iTitle, empty);
+  } else {
+    for (const rowData of fin.byItem) {
+      const row = document.createElement('div');
+      row.className = 'ledger-row';
+      const dt = document.createElement('dt');
+      dt.textContent = `${rowData.name} (${rowData.count})`;
+      const dd = document.createElement('dd');
+      dd.textContent = fmtEuroCents(rowData.grossCents);
+      row.append(dt, dd);
+      iDl.appendChild(row);
+    }
+    itemsCard.append(iTitle, iDl);
+  }
+
+  grid.append(streamsCard, itemsCard);
+  panel.appendChild(grid);
+}
+
+function renderEventsPanel() {
+  const panel = el('panelEvents');
+  panel.replaceChildren();
+
+  const layout = document.createElement('div');
+  layout.className = 'cafe-studio-grid';
+
+  const leftCol = document.createElement('div');
+  leftCol.className = 'admin-list';
+
+  const createCard = document.createElement('div');
+  createCard.className = 'admin-row-card';
+  const cTitle = document.createElement('h3');
+  cTitle.className = 'bike-name';
+  cTitle.textContent = 'Schedule Café / Studio Event';
+
+  const evForm = document.createElement('form');
+  evForm.className = 'guest-form';
+  evForm.style.marginTop = '12px';
+
+  const row1 = document.createElement('div');
+  row1.className = 'field-pair';
+  const dInp = document.createElement('input');
+  dInp.type = 'date';
+  dInp.className = 'text-input';
+  dInp.required = true;
+  dInp.value = state.overview.today;
+  const tInp = document.createElement('input');
+  tInp.type = 'text';
+  tInp.className = 'text-input';
+  tInp.placeholder = 'Start time (e.g. 18:30)';
+  tInp.value = '18:30';
+  row1.append(dInp, tInp);
+
+  const titleInp = document.createElement('input');
+  titleInp.type = 'text';
+  titleInp.className = 'text-input';
+  titleInp.required = true;
+  titleInp.placeholder = 'Event title (e.g. Zwift Watch Party)';
+
+  const row2 = document.createElement('div');
+  row2.className = 'field-pair';
+  const locSel = document.createElement('select');
+  locSel.className = 'text-input';
+  for (const loc of ['Studio l’Échappée', 'Café', 'Club Ride']) {
+    const o = document.createElement('option');
+    o.value = loc;
+    o.textContent = loc;
+    locSel.appendChild(o);
+  }
+  const visSel = document.createElement('select');
+  visSel.className = 'text-input';
+  for (const [val, txt] of [
+    ['public', 'Public event'],
+    ['internal', 'Internal / Staff & Leaders'],
+  ]) {
+    const o = document.createElement('option');
+    o.value = val;
+    o.textContent = txt;
+    visSel.appendChild(o);
+  }
+  row2.append(locSel, visSel);
+
+  const notesInp = document.createElement('input');
+  notesInp.type = 'text';
+  notesInp.className = 'text-input';
+  notesInp.placeholder = 'Notes (catering, expected guests, brand partner)';
+
+  const submitEv = document.createElement('button');
+  submitEv.type = 'submit';
+  submitEv.className = 'btn-yellow';
+  submitEv.textContent = 'Add event to calendar';
+
+  evForm.append(row1, titleInp, row2, notesInp, submitEv);
+  evForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+      event_date: dInp.value,
+      start_time: tInp.value.trim(),
+      title: titleInp.value.trim(),
+      location: locSel.value,
+      visibility: visSel.value,
+      expected_guests: 40,
+      notes: notesInp.value.trim(),
+    };
+    if (state.demoMode) {
+      state.overview.events.push({ id: Date.now(), ...payload, status: 'scheduled' });
+      renderDashboard();
+      return;
+    }
+    const resp = await fetch('./api/admin/events', {
+      method: 'POST',
+      headers: apiHeaders(),
+      body: JSON.stringify(payload),
+    });
+    if (resp.ok) {
+      state.overview = (await resp.json()).overview;
+      renderDashboard();
+    }
+  });
+  createCard.append(cTitle, evForm);
+  leftCol.appendChild(createCard);
+
+  for (const ev of state.overview.events || []) {
+    const card = document.createElement('div');
+    card.className = `admin-row-card${ev.status === 'cancelled' ? ' is-dimmed' : ''}`;
+    const head = document.createElement('div');
+    head.className = 'admin-row-head';
+    const info = document.createElement('div');
+    const st = document.createElement('strong');
+    st.textContent = `${ev.event_date}${ev.start_time ? ` · ${ev.start_time}` : ''} — ${ev.title}`;
+    const sub = document.createElement('span');
+    sub.className = 'admin-sub';
+    sub.textContent = `${ev.location} · ${ev.visibility === 'internal' ? 'Internal' : 'Public'}${
+      ev.expected_guests ? ` · ~${ev.expected_guests} guests` : ''
+    }`;
+    info.append(st, sub);
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'size-btn';
+    delBtn.textContent = 'Remove';
+    delBtn.addEventListener('click', async () => {
+      if (state.demoMode) {
+        state.overview.events = state.overview.events.filter((x) => x.id !== ev.id);
+        renderDashboard();
+        return;
+      }
+      const resp = await fetch(`./api/admin/events/${ev.id}`, {
+        method: 'DELETE',
+        headers: apiHeaders(),
+      });
+      if (resp.ok) {
+        state.overview = (await resp.json()).overview;
+        renderDashboard();
+      }
+    });
+
+    head.append(info, delBtn);
+    const notes = document.createElement('p');
+    notes.className = 'bike-spec-line';
+    notes.style.marginTop = '8px';
+    notes.textContent = ev.notes || '—';
+    card.append(head, notes);
+    leftCol.appendChild(card);
+  }
+
+  const rightCol = document.createElement('div');
+  rightCol.className = 'admin-list';
+
+  const inqHeader = document.createElement('h3');
+  inqHeader.className = 'bike-name';
+  inqHeader.textContent = 'Inbound Studio l’Échappée Inquiries';
+  rightCol.appendChild(inqHeader);
+
+  for (const inq of state.overview.studioInquiries) {
+    const card = document.createElement('div');
+    card.className = 'admin-row-card';
+    const head = document.createElement('div');
+    head.className = 'admin-row-head';
+    const left = document.createElement('div');
+    const st = document.createElement('strong');
+    st.textContent = `${inq.name} · ${inq.guests} guests`;
+    const sub = document.createElement('span');
+    sub.className = 'admin-sub';
+    sub.textContent = `${inq.email}${inq.event_date ? ` · Preferred: ${inq.event_date}` : ''}`;
+    left.append(st, sub);
+
+    const btns = document.createElement('div');
+    btns.className = 'admin-head-right';
+
+    const convertBtn = document.createElement('button');
+    convertBtn.type = 'button';
+    convertBtn.className = 'size-btn is-selected';
+    convertBtn.textContent = 'Add to Events';
+    convertBtn.addEventListener('click', async () => {
+      const payload = {
+        event_date: inq.event_date || state.overview.today,
+        start_time: '18:00',
+        title: inq.name,
+        location: 'Studio l’Échappée',
+        visibility: 'internal',
+        expected_guests: inq.guests,
+        notes: `${inq.email} — ${inq.notes || ''}`,
+      };
+      if (state.demoMode) {
+        state.overview.events.push({ id: Date.now(), ...payload, status: 'scheduled' });
+        inq.status = 'replied';
+        renderDashboard();
+        return;
+      }
+      await fetch('./api/admin/events', {
+        method: 'POST',
+        headers: apiHeaders(),
+        body: JSON.stringify(payload),
+      });
+      const resp = await fetch(`./api/admin/studio-inquiries/${inq.id}`, {
+        method: 'PATCH',
+        headers: apiHeaders(),
+        body: JSON.stringify({ status: 'replied' }),
+      });
+      if (resp.ok) {
+        state.overview = (await resp.json()).overview;
+        renderDashboard();
+      }
+    });
+
+    const statusBtn = document.createElement('button');
+    statusBtn.type = 'button';
+    statusBtn.className = `size-btn${inq.status === 'replied' ? ' is-fit' : ''}`;
+    statusBtn.textContent = inq.status === 'new' ? 'Mark replied' : 'Replied ✓';
+    statusBtn.addEventListener('click', async () => {
+      const next = inq.status === 'new' ? 'replied' : 'new';
+      if (state.demoMode) {
+        inq.status = next;
+        renderDashboard();
+        return;
+      }
+      const resp = await fetch(`./api/admin/studio-inquiries/${inq.id}`, {
+        method: 'PATCH',
+        headers: apiHeaders(),
+        body: JSON.stringify({ status: next }),
+      });
+      if (resp.ok) {
+        state.overview = (await resp.json()).overview;
+        renderDashboard();
+      }
+    });
+
+    btns.append(convertBtn, statusBtn);
+    head.append(left, btns);
+    const notes = document.createElement('p');
+    notes.className = 'bike-spec-line';
+    notes.style.marginTop = '8px';
+    notes.textContent = inq.notes || '—';
+
+    card.append(head, notes);
+    rightCol.appendChild(card);
+  }
+
+  layout.append(leftCol, rightCol);
+  panel.appendChild(layout);
 }
 
 function renderWorkshopPanel() {
@@ -615,7 +1156,7 @@ function renderClubPanel() {
   notesCard.className = 'admin-row-card';
   const notesTitle = document.createElement('h3');
   notesTitle.className = 'bike-name';
-  notesTitle.textContent = 'Club Planning Notes';
+  notesTitle.textContent = 'Club Planning Notes (visible on /leaders)';
   const ta = document.createElement('textarea');
   ta.className = 'text-area';
   ta.rows = 6;
@@ -690,76 +1231,15 @@ function renderClubPanel() {
   panel.appendChild(layout);
 }
 
-function renderStudioPanel() {
-  const panel = el('panelStudio');
-  panel.replaceChildren();
-  const list = state.overview.studioInquiries;
-
-  if (list.length === 0) {
-    const p = document.createElement('p');
-    p.className = 'fleet-meta';
-    p.textContent = 'No studio inquiries yet.';
-    panel.appendChild(p);
-    return;
-  }
-
-  const stack = document.createElement('div');
-  stack.className = 'admin-list';
-
-  for (const inq of list) {
-    const card = document.createElement('div');
-    card.className = 'admin-row-card';
-    const head = document.createElement('div');
-    head.className = 'admin-row-head';
-    const left = document.createElement('div');
-    const st = document.createElement('strong');
-    st.textContent = `${inq.name} · ${inq.guests} guests`;
-    const sub = document.createElement('span');
-    sub.className = 'admin-sub';
-    sub.textContent = `${inq.email}${inq.event_date ? ` · Preferred: ${inq.event_date}` : ''}`;
-    left.append(st, sub);
-
-    const statusBtn = document.createElement('button');
-    statusBtn.type = 'button';
-    statusBtn.className = `size-btn${inq.status === 'replied' ? ' is-fit' : ''}`;
-    statusBtn.textContent = inq.status === 'new' ? 'Mark replied' : 'Replied ✓';
-    statusBtn.addEventListener('click', async () => {
-      const next = inq.status === 'new' ? 'replied' : 'new';
-      if (state.demoMode) {
-        inq.status = next;
-        renderDashboard();
-        return;
-      }
-      const resp = await fetch(`./api/admin/studio-inquiries/${inq.id}`, {
-        method: 'PATCH',
-        headers: apiHeaders(),
-        body: JSON.stringify({ status: next }),
-      });
-      if (resp.ok) {
-        state.overview = (await resp.json()).overview;
-        renderDashboard();
-      }
-    });
-
-    head.append(left, statusBtn);
-    const notes = document.createElement('p');
-    notes.className = 'bike-spec-line';
-    notes.textContent = inq.notes || '—';
-
-    card.append(head, notes);
-    stack.appendChild(card);
-  }
-  panel.appendChild(stack);
-}
-
 function renderDashboard() {
   if (!state.overview) return;
   renderKpis();
   renderTabSeg();
   renderPrepPanel();
+  renderFinancePanel();
+  renderEventsPanel();
   renderWorkshopPanel();
   renderClubPanel();
-  renderStudioPanel();
 }
 
 el('adminRefreshBtn').addEventListener('click', loadOverview);

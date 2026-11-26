@@ -42,6 +42,7 @@ export function openDb(dbPath = DEFAULT_DB_PATH) {
       total_cents INTEGER NOT NULL,
       vat_cents INTEGER NOT NULL,
       stripe_session_id TEXT NOT NULL DEFAULT '',
+      fulfillment_status TEXT NOT NULL DEFAULT 'scheduled' CHECK (fulfillment_status IN ('scheduled', 'picked_up', 'returned')),
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -144,7 +145,26 @@ export function openDb(dbPath = DEFAULT_DB_PATH) {
       status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'replied', 'archived')),
       created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      event_date TEXT NOT NULL,
+      start_time TEXT NOT NULL DEFAULT '',
+      title TEXT NOT NULL,
+      location TEXT NOT NULL DEFAULT 'Studio l’Échappée',
+      visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'internal')),
+      expected_guests INTEGER NOT NULL DEFAULT 40,
+      notes TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'cancelled')),
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
   `);
+
+  const bookingCols = db.prepare('PRAGMA table_info(bookings)').all().map((c) => c.name);
+  if (!bookingCols.includes('fulfillment_status')) {
+    db.exec("ALTER TABLE bookings ADD COLUMN fulfillment_status TEXT NOT NULL DEFAULT 'scheduled'");
+  }
   return db;
 }
 
@@ -209,6 +229,36 @@ export function seedClubIfEmpty(db, seedPath = SEED_CLUB_PATH) {
       VALUES (1, ?, ?)
       ON CONFLICT(id) DO UPDATE SET content = excluded.content, updated_at = excluded.updated_at
     `).run(seed.planning_notes || '', ts);
+
+    const evCount = db.prepare('SELECT COUNT(*) AS c FROM events').get().c;
+    if (evCount === 0) {
+      const insEv = db.prepare(`
+        INSERT INTO events (event_date, start_time, title, location, visibility, expected_guests, notes, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'scheduled', ?, ?)
+      `);
+      insEv.run(
+        '2026-12-15',
+        '19:00',
+        'Le Peloton Christmas Party',
+        'Studio l’Échappée',
+        'public',
+        80,
+        'Annual club & café holiday gathering three doors down in l’Échappée.',
+        ts,
+        ts
+      );
+      insEv.run(
+        '2026-12-24',
+        '08:00',
+        'Café Closed (Christmas Eve & Day)',
+        'Café',
+        'public',
+        0,
+        'No bike rental pickups or café service on Dec 24 & Dec 25.',
+        ts,
+        ts
+      );
+    }
   });
 
   return true;
