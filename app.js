@@ -37,14 +37,6 @@ const initLang = initParams.get('lang') === 'fr' ? 'fr' : 'en';
 const initCatRaw = initParams.get('category');
 const initCatObj = CATEGORIES.find((c) => c.id === initCatRaw || c.brmCategoryId === initCatRaw);
 
-const savedLeader = (() => {
-  try {
-    return localStorage.getItem('peloton_leader_name') || '';
-  } catch {
-    return '';
-  }
-})();
-
 const state = {
   lang: initLang,
   backendMode: 'static',
@@ -66,9 +58,7 @@ const state = {
   clubDate: parisDateOffset(3),
   clubUpcomingDates: [],
   clubRides: [],
-  clubLeaders: [],
   clubSeedCache: null,
-  leaderName: savedLeader,
   bag: [],
   drawerMode: 'bag',
   confirmedBooking: null,
@@ -280,35 +270,28 @@ async function refreshLiveAvailability() {
 function buildStaticRidesForDate(seed, dateStr) {
   const existing = (seed.rides || []).filter((r) => r.ride_date === dateStr);
   const order = { Spicy: 1, Medium: 2, Mild: 3 };
-  let localEdits = {};
-  try {
-    localEdits = JSON.parse(localStorage.getItem('peloton_static_club_edits') || '{}');
-  } catch {}
-
   const baseList =
     existing.length > 0
-      ? existing.map((r) => ({ ...r, leaders: [...(r.leaders || [])] }))
+      ? existing.map((r) => ({
+          ride_date: r.ride_date,
+          pace: r.pace,
+          title: r.title,
+          start_time: r.start_time,
+          status: r.status,
+          route_name: r.route_name || '',
+          route_url: r.route_url || '',
+        }))
       : CLUB_PACES.map((cp) => ({
           ride_date: dateStr,
           pace: cp.pace,
           title: 'Club Ride',
           start_time: cp.defaultTime,
           status: 'open',
-          leaders: [],
           route_name: '',
-          notes: '',
+          route_url: '',
         }));
 
-  return baseList
-    .map((r) => {
-      const override = localEdits[`${dateStr}::${r.pace}`];
-      return {
-        ...r,
-        effective_status: r.status === 'cancelled' ? 'cancelled' : 'open',
-        leaders: override ? override : r.leaders,
-      };
-    })
-    .sort((a, b) => (order[a.pace] || 9) - (order[b.pace] || 9));
+  return baseList.sort((a, b) => (order[a.pace] || 9) - (order[b.pace] || 9));
 }
 
 async function loadInitialBackendOrStatic() {
@@ -335,7 +318,6 @@ async function loadInitialBackendOrStatic() {
       state.clubDate = data.club.date;
       state.clubUpcomingDates = data.club.upcomingDates || [];
       state.clubRides = data.club.rides || [];
-      state.clubLeaders = data.club.leaders || [];
 
       const cancelledRef = initParams.get('booking_cancelled');
       if (cancelledRef) {
@@ -368,7 +350,6 @@ async function loadInitialBackendOrStatic() {
     if (seedResp.ok) {
       const seed = await seedResp.json();
       state.clubSeedCache = seed;
-      state.clubLeaders = seed.leaders || [];
       const seen = new Set();
       const upcoming = [];
       for (const r of seed.rides || []) {
@@ -493,8 +474,9 @@ function syncStaticLabels() {
   el('clubMeta').textContent = txt.clubMeta;
   el('lblClubDate').textContent = txt.clubDateLabel;
   el('lblClubUpcoming').textContent = txt.clubUpcomingLabel;
-  el('lblClubLeader').textContent = txt.clubLeaderInputLabel;
-  el('clubLeaderInput').placeholder = txt.clubLeaderPlaceholder;
+  el('clubStravaTopBtn').textContent = txt.clubJoinStrava;
+  el('clubStravaTopBtn').href = STORE.stravaClubUrl;
+  el('clubStravaNote').textContent = txt.clubStravaNote;
 
   el('cafeEyebrow').textContent = txt.cafeEyebrow;
   el('cafeHeading').textContent = txt.cafeTitle;
@@ -945,88 +927,12 @@ async function selectClubDate(nextDate) {
   renderClubSection();
 }
 
-function showClubFeedback(msg, isError = false) {
-  const fb = el('clubFeedback');
-  fb.hidden = false;
-  fb.className = `club-feedback${isError ? ' is-error' : ''}`;
-  fb.textContent = msg;
-}
-
-async function handleClubLeaderAction(pace, action) {
-  const name = el('clubLeaderInput').value.trim().replace(/\s+/g, ' ');
-  if (name.length < 2) {
-    el('clubLeaderInput').focus();
-    showClubFeedback(
-      state.lang === 'fr' ? 'Entrez votre prénom de Ride Leader ci-dessus.' : 'Enter your ride leader name above first.',
-      true
-    );
-    return;
-  }
-  state.leaderName = name;
-  try {
-    localStorage.setItem('peloton_leader_name', name);
-  } catch {}
-
-  if (state.backendMode === 'live') {
-    const endpoint = action === 'withdraw' ? './api/club/withdraw' : './api/club/signup';
-    const resp = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, date: state.clubDate, pace }),
-    });
-    const data = await resp.json();
-    if (!resp.ok) {
-      showClubFeedback(data.error || 'Unable to update leader list.', true);
-      return;
-    }
-    state.clubRides = data.rides || state.clubRides;
-    if (data.leaders) state.clubLeaders = data.leaders;
-    showClubFeedback(
-      action === 'withdraw'
-        ? `${name} removed from ${pace} (${state.clubDate}).`
-        : `${name} signed up to lead ${pace} (${state.clubDate}).`
-    );
-    renderClubSection();
-    return;
-  }
-
-  const target = state.clubRides.find((r) => r.pace === pace);
-  if (!target) return;
-  const idx = target.leaders.findIndex((l) => l.toLowerCase() === name.toLowerCase());
-  if (action === 'withdraw' && idx !== -1) {
-    target.leaders.splice(idx, 1);
-  } else if (action === 'signup' && idx === -1 && target.leaders.length < 4) {
-    target.leaders.push(name);
-  }
-  try {
-    const edits = JSON.parse(localStorage.getItem('peloton_static_club_edits') || '{}');
-    edits[`${state.clubDate}::${pace}`] = target.leaders;
-    localStorage.setItem('peloton_static_club_edits', JSON.stringify(edits));
-  } catch {}
-  showClubFeedback(
-    action === 'withdraw'
-      ? `${name} removed from ${pace} (${state.clubDate}).`
-      : `${name} signed up to lead ${pace} (${state.clubDate}).`
-  );
-  renderClubSection();
-}
-
 function renderClubSection() {
-  const txt = t();
   const today = parisDateOffset(0);
   const dateInput = el('clubDateInput');
   dateInput.min = today;
   if (state.clubDate < today) state.clubDate = today;
   dateInput.value = state.clubDate;
-
-  el('clubLeaderInput').value = state.leaderName;
-  const dl = el('clubLeaderDatalist');
-  dl.replaceChildren();
-  for (const name of state.clubLeaders) {
-    const opt = document.createElement('option');
-    opt.value = name;
-    dl.appendChild(opt);
-  }
 
   const pillsWrap = el('clubDatePills');
   pillsWrap.replaceChildren();
@@ -1055,15 +961,9 @@ function renderClubCards() {
       pace: paceName,
       title: 'Club Ride',
       start_time: meta.defaultTime,
-      leaders: [],
-      effective_status: 'open',
-      notes: '',
+      route_name: '',
+      route_url: '',
     };
-
-    const leaders = ride.leaders || [];
-    const currentName = state.leaderName.trim().toLowerCase();
-    const isLeading = Boolean(currentName) && leaders.some((l) => l.toLowerCase() === currentName);
-    const isFull = leaders.length >= meta.maxLeaders;
 
     const card = document.createElement('article');
     card.className = 'club-card';
@@ -1091,49 +991,15 @@ function renderClubCards() {
 
     top.append(badgeRow, titleEl, detailEl);
 
-    const leaderBox = document.createElement('div');
-    leaderBox.className = 'club-leaders-box';
-    const statusLine = document.createElement('div');
-    statusLine.className = 'club-leader-head';
-    const countSpan = document.createElement('span');
-    countSpan.textContent = `Ride Leaders (${leaders.length}/${meta.maxLeaders})`;
-    const badgeSpan = document.createElement('span');
-    badgeSpan.className = `stock-caption${leaders.length === 0 ? ' is-empty' : ''}`;
-    badgeSpan.textContent = isLeading
-      ? txt.clubSignedBadge
-      : leaders.length === 0
-        ? txt.clubNeedLeader
-        : isFull
-          ? txt.clubFullLeaders
-          : `${leaders.length} ready`;
-    statusLine.append(countSpan, badgeSpan);
-
-    const chips = document.createElement('div');
-    chips.className = 'leader-chips';
-    if (leaders.length === 0) {
-      const empty = document.createElement('span');
-      empty.className = 'leader-empty';
-      empty.textContent = txt.clubNoLeadersYet;
-      chips.appendChild(empty);
-    } else {
-      for (const l of leaders) {
-        const chip = document.createElement('span');
-        chip.className = 'leader-chip';
-        chip.textContent = l;
-        chips.appendChild(chip);
-      }
-    }
-    leaderBox.append(statusLine, chips);
-
     const actions = document.createElement('div');
     actions.className = 'club-card-actions';
 
-    const leadBtn = document.createElement('button');
-    leadBtn.type = 'button';
-    leadBtn.className = isLeading ? 'btn-ghost' : 'btn-yellow';
-    leadBtn.disabled = !isLeading && isFull;
-    leadBtn.textContent = isLeading ? txt.clubWithdrawBtn : isFull ? txt.clubFullLeaders : txt.clubSignUpBtn;
-    leadBtn.addEventListener('click', () => handleClubLeaderAction(paceName, isLeading ? 'withdraw' : 'signup'));
+    const stravaBtn = document.createElement('a');
+    stravaBtn.className = 'btn-yellow';
+    stravaBtn.href = ride.route_url || STORE.stravaClubUrl;
+    stravaBtn.target = '_blank';
+    stravaBtn.rel = 'noopener noreferrer';
+    stravaBtn.textContent = txt.clubJoinStrava;
 
     const rentLink = document.createElement('button');
     rentLink.type = 'button';
@@ -1151,8 +1017,8 @@ function renderClubCards() {
       el('fleet').scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
     });
 
-    actions.append(leadBtn, rentLink);
-    card.append(top, leaderBox, actions);
+    actions.append(stravaBtn, rentLink);
+    card.append(top, actions);
     grid.appendChild(card);
   }
 }
@@ -1876,11 +1742,6 @@ function bindEvents() {
 
   el('clubDateInput').addEventListener('change', (e) => {
     selectClubDate(e.target.value);
-  });
-
-  el('clubLeaderInput').addEventListener('input', (e) => {
-    state.leaderName = e.target.value;
-    renderClubCards();
   });
 
   el('studioForm').addEventListener('submit', async (e) => {

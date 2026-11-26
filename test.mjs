@@ -119,6 +119,7 @@ await withServer(
   {
     dbPath: path.join(tmpDir, 'direct.db'),
     organizerKey: 'test-org-secret-1234',
+    leaderKey: 'test-leader-secret-5678',
     env: {},
   },
   async ({ baseUrl }) => {
@@ -128,6 +129,8 @@ await withServer(
     assert.equal(boot.mode, 'live');
     assert.equal(boot.stripeEnabled, false);
     assert.equal(boot.fleetStock['5659947097391104'].XL, 1);
+    assert.equal(boot.club.leaders, undefined, 'Public bootstrap must not expose leader roster');
+    assert.equal(boot.club.rides[0]?.leaders, undefined, 'Public rides must not expose leader names');
 
     const secCheck = await fetch(`${baseUrl}/server.js`);
     assert.equal(secCheck.status, 404);
@@ -196,21 +199,44 @@ await withServer(
     const availAfterHold = await (await fetch(`${baseUrl}/api/availability?pickupDate=${futureDate}`)).json();
     assert.equal(availAfterHold.fleetStock['5474683819393024'].XXS, 0);
 
-    const clubSignup = await fetch(`${baseUrl}/api/club/signup`, {
+    const unauthLeader = await fetch(`${baseUrl}/api/leaders/meta`);
+    assert.equal(unauthLeader.status, 401);
+
+    const randomLeaderReject = await fetch(`${baseUrl}/api/leaders/signup`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-leader-key': 'test-leader-secret-5678' },
+      body: JSON.stringify({ name: 'RandomTourist', date: futureDate, pace: 'Medium' }),
+    });
+    assert.equal(randomLeaderReject.status, 403);
+
+    const clubSignup = await fetch(`${baseUrl}/api/leaders/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-leader-key': 'test-leader-secret-5678' },
       body: JSON.stringify({ name: 'Tess', date: futureDate, pace: 'Medium' }),
     });
     assert.equal(clubSignup.status, 200);
     const clubData = await clubSignup.json();
     assert.ok(clubData.rides.find((r) => r.pace === 'Medium').leaders.includes('Tess'));
 
-    const clubWithdraw = await fetch(`${baseUrl}/api/club/withdraw`, {
+    const myRidesRes = await (
+      await fetch(`${baseUrl}/api/leaders/my-rides?name=Tess`, {
+        headers: { 'x-leader-key': 'test-leader-secret-5678' },
+      })
+    ).json();
+    assert.ok(myRidesRes.rides.some((r) => r.ride_date === futureDate && r.pace === 'Medium'));
+
+    const clubWithdraw = await fetch(`${baseUrl}/api/leaders/withdraw`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-leader-key': 'test-leader-secret-5678' },
       body: JSON.stringify({ name: 'Tess', date: futureDate, pace: 'Medium' }),
     });
     assert.equal(clubWithdraw.status, 200);
+
+    const csvRes = await fetch(`${baseUrl}/api/admin/club/export.csv`, {
+      headers: { 'x-organizer-key': 'test-org-secret-1234' },
+    });
+    assert.equal(csvRes.status, 200);
+    assert.ok((await csvRes.text()).startsWith('Date,Pace,Title,Start Time,Status,Leaders'));
 
     const studioRes = await fetch(`${baseUrl}/api/studio/inquiries`, {
       method: 'POST',

@@ -1792,9 +1792,87 @@ select {
 
 .club-deck-top {
   display: grid;
-  grid-template-columns: 165px 1fr 240px;
+  grid-template-columns: 220px 1fr 180px;
   gap: 16px;
   align-items: end;
+}
+
+.club-deck-public {
+  display: grid;
+  grid-template-columns: 165px 1fr auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.club-strava-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.strava-deck-cta {
+  white-space: nowrap;
+}
+
+.my-rides-panel {
+  background: var(--paper);
+  border-radius: 20px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 22px;
+}
+
+.my-rides-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.my-rides-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 19px;
+}
+
+.my-rides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.my-ride-pill {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--canvas);
+}
+
+.admin-club-bar {
+  margin-bottom: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.admin-club-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-club-forms {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 12px;
+}
+
+.admin-roster-form {
+  grid-template-columns: 1fr auto;
 }
 
 .club-upcoming-wrap {
@@ -2465,6 +2543,8 @@ select {
   .fleet-grid,
   .tours-grid,
   .club-deck-top,
+  .club-deck-public,
+  .admin-club-forms,
   .studio-form .field-pair,
   .admin-kpis,
   .admin-inline-edit {

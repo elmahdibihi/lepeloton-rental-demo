@@ -154,22 +154,18 @@
         </div>
 
         <div class="club-deck">
-          <div class="club-deck-top">
+          <div class="club-deck-public">
             <div class="deck-field">
               <label for="clubDateInput" id="lblClubDate">Ride date</label>
               <input type="date" id="clubDateInput">
             </div>
             <div class="club-upcoming-wrap">
-              <span class="field-caption" id="lblClubUpcoming">Scheduled club dates</span>
+              <span class="field-caption" id="lblClubUpcoming">Upcoming club dates</span>
               <div class="club-date-pills" id="clubDatePills"></div>
             </div>
-            <div class="deck-field club-leader-field">
-              <label for="clubLeaderInput" id="lblClubLeader">Ride leader name</label>
-              <input type="text" id="clubLeaderInput" list="clubLeaderDatalist" maxlength="48" placeholder="Choose or type your name">
-              <datalist id="clubLeaderDatalist"></datalist>
-            </div>
+            <a class="btn-yellow strava-deck-cta" id="clubStravaTopBtn" href="https://www.strava.com/clubs/731978" target="_blank" rel="noopener noreferrer">Join on Strava Club ↗</a>
           </div>
-          <p class="club-feedback" id="clubFeedback" hidden role="status"></p>
+          <p class="club-strava-note" id="clubStravaNote">Routes, GPX files &amp; weekly RSVPs are posted on the official Le Peloton Cycling Club Strava page.</p>
         </div>
 
         <div class="club-grid" id="clubGrid"></div>

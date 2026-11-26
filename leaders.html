@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le Peloton Cycling Club — Internal Ride Leaders</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230E1114'/%3E%3Ccircle cx='32' cy='32' r='16' fill='%23F4C826'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="admin-body">
+  <header class="admin-top">
+    <div class="wrap admin-top-inner">
+      <div class="admin-brand-row">
+        <a href="./" class="brand" aria-label="Le Peloton Café">
+          <img src="./assets/img/peloton-wordmark.png" alt="Le Peloton Café" class="logo-light">
+        </a>
+        <div>
+          <span class="clubhouse-eyebrow">Internal · Selected Ride Leaders</span>
+          <h1 class="admin-title">Ride Leader Sign-Up Board</h1>
+        </div>
+      </div>
+
+      <div class="admin-actions">
+        <span class="admin-status-pill" id="leaderModePill">Live SQLite</span>
+        <a href="https://www.strava.com/clubs/731978" target="_blank" rel="noopener noreferrer" class="btn-glass">Strava Club ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap admin-main">
+    <section class="club-deck">
+      <div class="club-deck-top">
+        <div class="deck-field">
+          <label for="leaderSelect">Selected ride leader</label>
+          <select id="leaderSelect"></select>
+        </div>
+        <div class="club-upcoming-wrap">
+          <span class="field-caption">Upcoming club dates</span>
+          <div class="club-date-pills" id="leaderDatePills"></div>
+        </div>
+        <div class="deck-field">
+          <label for="leaderDateInput">Or pick any date</label>
+          <input type="date" id="leaderDateInput">
+        </div>
+      </div>
+      <p class="club-feedback" id="leaderFeedback" hidden role="status"></p>
+    </section>
+
+    <section class="my-rides-panel" id="myRidesPanel" hidden>
+      <div class="my-rides-head">
+        <h2 id="myRidesHeading">Your upcoming rides</h2>
+        <span class="admin-sub" id="myRidesCount"></span>
+      </div>
+      <div class="my-rides-grid" id="myRidesGrid"></div>
+    </section>
+
+    <section class="club-grid" id="leaderCardsGrid"></section>
+  </main>
+
+  <script type="module" src="./leaders.js"></script>
+</body>
+</html>

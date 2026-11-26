@@ -54,6 +54,7 @@ const PUBLIC_FILES = new Map([
   ['/data.js', { file: 'data.js', type: 'text/javascript; charset=utf-8' }],
   ['/app.js', { file: 'app.js', type: 'text/javascript; charset=utf-8' }],
   ['/admin.js', { file: 'admin.js', type: 'text/javascript; charset=utf-8' }],
+  ['/leaders.js', { file: 'leaders.js', type: 'text/javascript; charset=utf-8' }],
   ['/seed-club.json', { file: 'seed-club.json', type: 'application/json; charset=utf-8' }],
 ]);
 
@@ -145,22 +146,42 @@ function sendHtml(res, status, html, extraHeaders = {}) {
   res.end(html);
 }
 
-function resolveOrCreateOrganizerKey(dataDir, envOrganizerKey) {
-  if (envOrganizerKey) return String(envOrganizerKey);
+function resolveOrCreateKeys(dataDir, envOrganizerKey, envLeaderKey) {
   fs.mkdirSync(dataDir, { recursive: true });
   const cfgPath = path.join(dataDir, 'config.json');
+  let parsed = {};
   if (fs.existsSync(cfgPath)) {
     try {
-      const parsed = JSON.parse(fs.readFileSync(cfgPath, 'utf-8'));
-      if (parsed.organizerKey) return parsed.organizerKey;
+      parsed = JSON.parse(fs.readFileSync(cfgPath, 'utf-8'));
     } catch {}
   }
-  const key = crypto.randomBytes(16).toString('hex');
-  fs.writeFileSync(cfgPath, JSON.stringify({ organizerKey: key }, null, 2), { mode: 0o600 });
-  return key;
+  const organizerKey = String(envOrganizerKey || parsed.organizerKey || crypto.randomBytes(16).toString('hex'));
+  const leaderKey = String(envLeaderKey || parsed.leaderKey || crypto.randomBytes(12).toString('hex'));
+  if (parsed.organizerKey !== organizerKey || parsed.leaderKey !== leaderKey) {
+    fs.writeFileSync(cfgPath, JSON.stringify({ organizerKey, leaderKey }, null, 2), { mode: 0o600 });
+  }
+  return { organizerKey, leaderKey };
 }
 
-function buildAdminOverview(db) {
+function sanitizePublicRide(r) {
+  return {
+    ride_date: r.ride_date,
+    pace: r.pace,
+    title: r.title,
+    start_time: r.start_time,
+    status: r.status,
+    effective_status: r.effective_status,
+    route_name: r.route_name,
+    route_url: r.route_url,
+  };
+}
+
+function csvCell(v) {
+  const s = String(v ?? '');
+  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function buildAdminOverview(db, leaderKey) {
   expireStalePendingBookings(db);
   const today = getTodayParis();
 
@@ -220,9 +241,11 @@ function buildAdminOverview(db) {
   }
 
   const studioInquiries = db.prepare('SELECT * FROM studio_inquiries ORDER BY id DESC LIMIT 40').all();
+  const recentActivity = db.prepare('SELECT * FROM activity_log ORDER BY id DESC LIMIT 15').all();
 
   return {
     today,
+    leaderPortalPath: `/leaders?key=${encodeURIComponent(leaderKey)}`,
     bookings,
     fleet,
     club: {
@@ -231,31 +254,32 @@ function buildAdminOverview(db) {
       leaders,
       workload: [...workloadMap.values()].sort((a, b) => b.total - a.total || a.name.localeCompare(b.name)),
       planningNotes,
+      recentActivity,
     },
     studioInquiries,
   };
 }
 
-function renderAdminGateHtml() {
+function renderKeyGateHtml({ title, subtitle, action, label, buttonText }) {
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Le Peloton Café — Staff Access</title>
+  <title>Le Peloton Café — ${title}</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="admin-gate-body">
   <main class="admin-gate-card">
     <p class="clubhouse-eyebrow">17 Rue du Pont Louis-Philippe</p>
-    <h1>Staff &amp; Workshop Ops</h1>
-    <p class="admin-gate-sub">Enter the organizer key to access morning bike prep, workshop stock holds, Cycling Club piloting, and l’Échappée inquiries.</p>
-    <form method="GET" action="/admin" class="guest-form">
+    <h1>${title}</h1>
+    <p class="admin-gate-sub">${subtitle}</p>
+    <form method="GET" action="${action}" class="guest-form">
       <div class="guest-field">
-        <label for="keyInput">Organizer key</label>
+        <label for="keyInput">${label}</label>
         <input id="keyInput" type="password" name="key" class="text-input" required autofocus placeholder="••••••••••••">
       </div>
-      <button type="submit" class="btn-yellow">Unlock operations board</button>
+      <button type="submit" class="btn-yellow">${buttonText}</button>
       <a href="/" class="btn-ghost" style="text-align:center">Back to storefront</a>
     </form>
   </main>
@@ -268,8 +292,12 @@ export function createPelotonApp(options = {}) {
   const env = options.env || process.env;
   const dbPath = options.dbPath || path.join(__dirname, 'data', 'peloton.db');
   const dataDir = path.dirname(dbPath);
-  // shortcut: shared organizer key for café staff, upgrade to per-staff SSO when team > 15
-  const organizerKey = resolveOrCreateOrganizerKey(dataDir, options.organizerKey ?? env.ORGANIZER_KEY);
+  // shortcut: shared keys for café staff and vetted ride leaders, upgrade to per-user SSO when team > 30
+  const { organizerKey, leaderKey } = resolveOrCreateKeys(
+    dataDir,
+    options.organizerKey ?? env.ORGANIZER_KEY,
+    options.leaderKey ?? env.LEADER_KEY
+  );
   const fetchImpl = options.fetchImpl || globalThis.fetch;
 
   const db = openDb(dbPath);
@@ -282,11 +310,32 @@ export function createPelotonApp(options = {}) {
     return `http://${safeHost}`;
   }
 
+  function safeKeyEq(a, b) {
+    if (!a || !b || a.length !== b.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+  }
+
   function isAuthorized(req, urlObj) {
     const candidate =
       urlObj.searchParams.get('key') || req.headers['x-organizer-key'] || parseCookies(req).peloton_org_key || '';
-    if (!candidate || candidate.length !== organizerKey.length) return false;
-    return crypto.timingSafeEqual(Buffer.from(candidate), Buffer.from(organizerKey));
+    return safeKeyEq(candidate, organizerKey);
+  }
+
+  function isLeaderAuthorized(req, urlObj) {
+    if (isAuthorized(req, urlObj)) return true;
+    const candidate =
+      urlObj.searchParams.get('key') || req.headers['x-leader-key'] || parseCookies(req).peloton_leader_key || '';
+    return safeKeyEq(candidate, leaderKey);
+  }
+
+  function fireSheetsWebhook(payload) {
+    const hookUrl = String(env.GOOGLE_SHEETS_WEBHOOK_URL || '').trim();
+    if (!hookUrl || !/^https?:\/\//.test(hookUrl)) return;
+    fetchImpl(hookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {});
   }
 
   const server = http.createServer(async (req, res) => {
@@ -343,9 +392,26 @@ export function createPelotonApp(options = {}) {
         return;
       }
 
+      if (req.method === 'GET' && pathname === '/leaders.html') {
+        res.writeHead(302, { Location: `/leaders${urlObj.search || ''}` });
+        res.end();
+        return;
+      }
+
       if (req.method === 'GET' && pathname === '/admin') {
         if (!isAuthorized(req, urlObj)) {
-          return sendHtml(res, 401, renderAdminGateHtml());
+          return sendHtml(
+            res,
+            401,
+            renderKeyGateHtml({
+              title: 'Staff & Workshop Ops',
+              subtitle:
+                'Enter the organizer key to access morning bike prep, workshop stock holds, Cycling Club piloting, and l’Échappée inquiries.',
+              action: '/admin',
+              label: 'Organizer key',
+              buttonText: 'Unlock operations board',
+            })
+          );
         }
         const html = fs.readFileSync(path.join(__dirname, 'admin.html'), 'utf-8');
         const hasQueryKey = Boolean(urlObj.searchParams.get('key'));
@@ -353,6 +419,32 @@ export function createPelotonApp(options = {}) {
         const extra = hasQueryKey
           ? {
               'Set-Cookie': `peloton_org_key=${encodeURIComponent(organizerKey)}; Path=/; HttpOnly; SameSite=Lax${secureAttr}`,
+            }
+          : {};
+        return sendHtml(res, 200, html, extra);
+      }
+
+      if (req.method === 'GET' && pathname === '/leaders') {
+        if (!isLeaderAuthorized(req, urlObj)) {
+          return sendHtml(
+            res,
+            401,
+            renderKeyGateHtml({
+              title: 'Ride Leaders Portal',
+              subtitle:
+                'Private sign-up board for selected Le Peloton Cycling Club ride leaders. Open your private WhatsApp link or enter the leader key.',
+              action: '/leaders',
+              label: 'Ride leader key',
+              buttonText: 'Open leader schedule',
+            })
+          );
+        }
+        const html = fs.readFileSync(path.join(__dirname, 'leaders.html'), 'utf-8');
+        const hasQueryKey = Boolean(urlObj.searchParams.get('key'));
+        const secureAttr = String(env.PUBLIC_URL || '').startsWith('https://') ? '; Secure' : '';
+        const extra = hasQueryKey
+          ? {
+              'Set-Cookie': `peloton_leader_key=${encodeURIComponent(leaderKey)}; Path=/; HttpOnly; SameSite=Lax${secureAttr}`,
             }
           : {};
         return sendHtml(res, 200, html, extra);
@@ -384,11 +476,7 @@ export function createPelotonApp(options = {}) {
             ? urlObj.searchParams.get('clubDate')
             : upcomingDates[0]?.ride_date || today;
 
-        const clubRides = ensureDraftDate(db, defaultClubDate, 'storefront');
-        const leaders = db
-          .prepare('SELECT name FROM leaders WHERE active = 1 ORDER BY name COLLATE NOCASE ASC')
-          .all()
-          .map((r) => r.name);
+        const clubRides = ensureDraftDate(db, defaultClubDate, 'storefront').map(sanitizePublicRide);
 
         return sendJson(res, 200, {
           mode: 'live',
@@ -400,7 +488,6 @@ export function createPelotonApp(options = {}) {
             date: defaultClubDate,
             upcomingDates,
             rides: clubRides,
-            leaders,
           },
         });
       }
@@ -775,93 +862,177 @@ export function createPelotonApp(options = {}) {
         if (!isValidDateStr(date) || date < today) {
           return sendJson(res, 400, { error: 'Choose today or a future date (YYYY-MM-DD).' });
         }
-        return sendJson(res, 200, { date, today, rides: ensureDraftDate(db, date, 'club-view') });
+        return sendJson(res, 200, {
+          date,
+          today,
+          rides: ensureDraftDate(db, date, 'club-view').map(sanitizePublicRide),
+        });
       }
 
-      if (req.method === 'POST' && pathname === '/api/club/signup') {
-        const body = await readJsonBody(req);
-        const name = normalizeName(body.name, 48);
-        const date = String(body.date || '').trim();
-        const pace = String(body.pace || '').trim();
-        const today = getTodayParis();
+      if (pathname.startsWith('/api/leaders/')) {
+        if (!isLeaderAuthorized(req, urlObj)) {
+          return sendJson(res, 401, { error: 'Unauthorized ride leader key.' });
+        }
 
-        if (name.length < 2) return sendJson(res, 400, { error: 'Enter your name (at least 2 characters).' });
-        if (!isValidDateStr(date) || date < today) return sendJson(res, 400, { error: 'Choose today or a future date.' });
-        if (!PACES.includes(pace)) return sendJson(res, 400, { error: 'Pace must be Mild, Medium, or Spicy.' });
+        if (req.method === 'GET' && pathname === '/api/leaders/meta') {
+          const today = getTodayParis();
+          const leaders = db
+            .prepare('SELECT name FROM leaders WHERE active = 1 ORDER BY name COLLATE NOCASE ASC')
+            .all()
+            .map((r) => r.name);
+          const upcomingDates = db
+            .prepare(
+              `SELECT DISTINCT ride_date, title FROM rides WHERE ride_date >= ? AND status != 'cancelled' ORDER BY ride_date ASC LIMIT 12`
+            )
+            .all(today);
+          const defaultDate = upcomingDates[0]?.ride_date || today;
+          return sendJson(res, 200, {
+            today,
+            leaders,
+            upcomingDates,
+            date: defaultDate,
+            rides: ensureDraftDate(db, defaultDate, 'leader-portal'),
+          });
+        }
 
-        const maxLeaders = CLUB_PACES.find((p) => p.pace === pace)?.maxLeaders || 4;
-        let result;
-        try {
-          result = withImmediateTx(db, () => {
-            ensureDraftDate(db, date, name);
-            const row = db.prepare('SELECT * FROM rides WHERE ride_date = ? AND pace = ?').get(date, pace);
-            const ride = hydrateRide(row);
-            if (!ride || ride.effective_status === 'cancelled' || ride.effective_status === 'completed') {
-              throw Object.assign(new Error('This ride group is closed.'), { statusCode: 403 });
+        if (req.method === 'GET' && pathname === '/api/leaders/rides') {
+          const date = urlObj.searchParams.get('date') || '';
+          const today = getTodayParis();
+          if (!isValidDateStr(date) || date < today) {
+            return sendJson(res, 400, { error: 'Choose today or a future date (YYYY-MM-DD).' });
+          }
+          return sendJson(res, 200, { date, today, rides: ensureDraftDate(db, date, 'leader-portal') });
+        }
+
+        if (req.method === 'GET' && pathname === '/api/leaders/my-rides') {
+          const name = normalizeName(urlObj.searchParams.get('name') || '', 48);
+          if (!name) return sendJson(res, 200, { name: '', rides: [] });
+          const today = getTodayParis();
+          const rows = db
+            .prepare(
+              `SELECT * FROM rides WHERE ride_date >= ? AND status NOT IN ('cancelled', 'completed') ORDER BY ride_date ASC, ${PACE_ORDER_SQL}`
+            )
+            .all(today);
+          const mine = [];
+          for (const row of rows) {
+            const r = hydrateRide(row);
+            const idx = findLeaderIdx(r.leaders, name);
+            if (idx !== -1) {
+              mine.push({
+                id: r.id,
+                ride_date: r.ride_date,
+                pace: r.pace,
+                title: r.title,
+                start_time: r.start_time,
+                co_leaders: r.leaders.filter((_, i) => i !== idx),
+              });
             }
-            const leaders = [...ride.leaders];
-            const existingIdx = findLeaderIdx(leaders, name);
-            if (existingIdx === -1) {
-              if (leaders.length >= maxLeaders) {
-                throw Object.assign(new Error(`${pace} already has ${maxLeaders} ride leaders.`), { statusCode: 409 });
+          }
+          return sendJson(res, 200, { name, rides: mine });
+        }
+
+        if (req.method === 'POST' && pathname === '/api/leaders/signup') {
+          const body = await readJsonBody(req);
+          const rawName = normalizeName(body.name, 48);
+          const date = String(body.date || '').trim();
+          const pace = String(body.pace || '').trim();
+          const today = getTodayParis();
+
+          if (!isValidDateStr(date) || date < today) return sendJson(res, 400, { error: 'Choose today or a future date.' });
+          if (!PACES.includes(pace)) return sendJson(res, 400, { error: 'Pace must be Mild, Medium, or Spicy.' });
+
+          const rosterRow = db
+            .prepare('SELECT name FROM leaders WHERE active = 1 AND lower(name) = lower(?)')
+            .get(rawName);
+          if (!rosterRow) {
+            return sendJson(res, 403, { error: 'Only selected ride leaders can sign up here. Ask Tess to add your name.' });
+          }
+          const name = rosterRow.name;
+          const maxLeaders = CLUB_PACES.find((p) => p.pace === pace)?.maxLeaders || 4;
+          let result;
+          try {
+            result = withImmediateTx(db, () => {
+              ensureDraftDate(db, date, name);
+              const row = db.prepare('SELECT * FROM rides WHERE ride_date = ? AND pace = ?').get(date, pace);
+              const ride = hydrateRide(row);
+              if (!ride || ride.effective_status === 'cancelled' || ride.effective_status === 'completed') {
+                throw Object.assign(new Error('This ride group is closed.'), { statusCode: 403 });
               }
-              leaders.push(name);
+              const leaders = [...ride.leaders];
+              if (findLeaderIdx(leaders, name) === -1) {
+                if (leaders.length >= maxLeaders) {
+                  throw Object.assign(new Error(`${pace} already has ${maxLeaders} ride leaders.`), { statusCode: 409 });
+                }
+                leaders.push(name);
+                const ts = nowIso();
+                db.prepare('UPDATE rides SET leaders = ?, updated_at = ? WHERE id = ?').run(
+                  JSON.stringify(leaders),
+                  ts,
+                  ride.id
+                );
+                db.prepare(
+                  'INSERT INTO activity_log (created_at, actor, action, ride_date, pace, details) VALUES (?, ?, ?, ?, ?, ?)'
+                ).run(ts, name, 'signup', date, pace, `Signed up to lead ${pace} on ${date}`);
+              }
+              return {
+                leaders,
+                rides: db.prepare(`SELECT * FROM rides WHERE ride_date = ? ORDER BY ${PACE_ORDER_SQL}`).all(date).map(hydrateRide),
+              };
+            });
+          } catch (err) {
+            if (err.statusCode) return sendJson(res, err.statusCode, { error: err.message });
+            throw err;
+          }
+          fireSheetsWebhook({ action: 'signup', name, date, pace, leaders: result.leaders, timestamp: nowIso() });
+          return sendJson(res, 200, { ok: true, rides: result.rides });
+        }
+
+        if (req.method === 'POST' && pathname === '/api/leaders/withdraw') {
+          const body = await readJsonBody(req);
+          const name = normalizeName(body.name, 48);
+          const date = String(body.date || '').trim();
+          const pace = String(body.pace || '').trim();
+          const today = getTodayParis();
+
+          if (!name || !isValidDateStr(date) || date < today || !PACES.includes(pace)) {
+            return sendJson(res, 400, { error: 'Valid name, future date, and pace required.' });
+          }
+
+          let nextLeaders;
+          let rides;
+          try {
+            const out = withImmediateTx(db, () => {
+              const row = db.prepare('SELECT * FROM rides WHERE ride_date = ? AND pace = ?').get(date, pace);
+              const ride = hydrateRide(row);
+              if (!ride) throw Object.assign(new Error('Ride not found.'), { statusCode: 404 });
+              const idx = findLeaderIdx(ride.leaders, name);
+              if (idx === -1) throw Object.assign(new Error(`${name} is not listed on ${pace}.`), { statusCode: 404 });
+              const removedName = ride.leaders[idx];
+              const updated = ride.leaders.filter((_, i) => i !== idx);
               const ts = nowIso();
               db.prepare('UPDATE rides SET leaders = ?, updated_at = ? WHERE id = ?').run(
-                JSON.stringify(leaders),
+                JSON.stringify(updated),
                 ts,
                 ride.id
               );
-              db.prepare('INSERT OR IGNORE INTO leaders (name, active) VALUES (?, 1)').run(name);
               db.prepare(
                 'INSERT INTO activity_log (created_at, actor, action, ride_date, pace, details) VALUES (?, ?, ?, ?, ?, ?)'
-              ).run(ts, name, 'signup', date, pace, `Signed up to lead ${pace} on ${date}`);
-            }
-            return {
-              rides: db.prepare(`SELECT * FROM rides WHERE ride_date = ? ORDER BY ${PACE_ORDER_SQL}`).all(date).map(hydrateRide),
-              leaders: db.prepare('SELECT name FROM leaders WHERE active = 1 ORDER BY name COLLATE NOCASE ASC').all().map((r) => r.name),
-            };
-          });
-        } catch (err) {
-          if (err.statusCode) return sendJson(res, err.statusCode, { error: err.message });
-          throw err;
+              ).run(ts, removedName, 'withdraw', date, pace, `Withdrew from ${pace} on ${date}`);
+              return {
+                removedName,
+                nextLeaders: updated,
+                rides: db.prepare(`SELECT * FROM rides WHERE ride_date = ? ORDER BY ${PACE_ORDER_SQL}`).all(date).map(hydrateRide),
+              };
+            });
+            nextLeaders = out.nextLeaders;
+            rides = out.rides;
+            fireSheetsWebhook({ action: 'withdraw', name: out.removedName, date, pace, leaders: nextLeaders, timestamp: nowIso() });
+          } catch (err) {
+            if (err.statusCode) return sendJson(res, err.statusCode, { error: err.message });
+            throw err;
+          }
+          return sendJson(res, 200, { ok: true, rides });
         }
-        return sendJson(res, 200, { ok: true, ...result });
-      }
-
-      if (req.method === 'POST' && pathname === '/api/club/withdraw') {
-        const body = await readJsonBody(req);
-        const name = normalizeName(body.name, 48);
-        const date = String(body.date || '').trim();
-        const pace = String(body.pace || '').trim();
-        const today = getTodayParis();
-
-        if (!name || !isValidDateStr(date) || date < today || !PACES.includes(pace)) {
-          return sendJson(res, 400, { error: 'Valid name, future date, and pace required.' });
-        }
-
-        const row = db.prepare('SELECT * FROM rides WHERE ride_date = ? AND pace = ?').get(date, pace);
-        const ride = hydrateRide(row);
-        if (!ride) return sendJson(res, 404, { error: 'Ride not found.' });
-        const idx = findLeaderIdx(ride.leaders, name);
-        if (idx === -1) return sendJson(res, 404, { error: `${name} is not listed on ${pace}.` });
-
-        const nextLeaders = ride.leaders.filter((_, i) => i !== idx);
-        const ts = nowIso();
-        db.prepare('UPDATE rides SET leaders = ?, updated_at = ? WHERE id = ?').run(
-          JSON.stringify(nextLeaders),
-          ts,
-          ride.id
-        );
-        db.prepare(
-          'INSERT INTO activity_log (created_at, actor, action, ride_date, pace, details) VALUES (?, ?, ?, ?, ?, ?)'
-        ).run(ts, name, 'withdraw', date, pace, `Withdrew from ${pace} on ${date}`);
-
-        const rides = db
-          .prepare(`SELECT * FROM rides WHERE ride_date = ? ORDER BY ${PACE_ORDER_SQL}`)
-          .all(date)
-          .map(hydrateRide);
-        return sendJson(res, 200, { ok: true, rides });
       }
 
       if (req.method === 'POST' && pathname === '/api/studio/inquiries') {
@@ -892,7 +1063,57 @@ export function createPelotonApp(options = {}) {
         }
 
         if (req.method === 'GET' && pathname === '/api/admin/overview') {
-          return sendJson(res, 200, buildAdminOverview(db));
+          return sendJson(res, 200, buildAdminOverview(db, leaderKey));
+        }
+
+        if (req.method === 'GET' && pathname === '/api/admin/club/export.csv') {
+          const rows = db.prepare(`SELECT * FROM rides ORDER BY ride_date ASC, ${PACE_ORDER_SQL}`).all().map(hydrateRide);
+          const header = ['Date', 'Pace', 'Title', 'Start Time', 'Status', 'Leaders', 'Route', 'Notes'];
+          const lines = [
+            header.join(','),
+            ...rows.map((r) =>
+              [
+                r.ride_date,
+                r.pace,
+                r.title,
+                r.start_time,
+                r.effective_status,
+                r.leaders.join(' / '),
+                r.route_name,
+                r.notes,
+              ]
+                .map(csvCell)
+                .join(',')
+            ),
+          ];
+          res.writeHead(200, {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': 'attachment; filename="lepeloton-ride-leaders.csv"',
+            'Cache-Control': 'no-store',
+          });
+          res.end(lines.join('\r\n'));
+          return;
+        }
+
+        if (req.method === 'POST' && pathname === '/api/admin/leaders') {
+          const body = await readJsonBody(req);
+          const name = normalizeName(body.name, 48);
+          if (name.length < 2) return sendJson(res, 400, { error: 'Leader name required.' });
+          db.prepare('INSERT OR IGNORE INTO leaders (name, active) VALUES (?, 1)').run(name);
+          db.prepare('UPDATE leaders SET active = 1 WHERE lower(name) = lower(?)').run(name);
+          return sendJson(res, 201, { ok: true, overview: buildAdminOverview(db, leaderKey) });
+        }
+
+        if (req.method === 'POST' && pathname === '/api/admin/rides') {
+          const body = await readJsonBody(req);
+          const rideDate = String(body.ride_date || '').trim();
+          const title = normalizeName(body.title || 'Club Ride', 80);
+          if (!isValidDateStr(rideDate)) return sendJson(res, 400, { error: 'Valid YYYY-MM-DD date required.' });
+          ensureDraftDate(db, rideDate, 'organizer');
+          if (title && title !== 'Club Ride') {
+            db.prepare('UPDATE rides SET title = ?, updated_at = ? WHERE ride_date = ?').run(title, nowIso(), rideDate);
+          }
+          return sendJson(res, 201, { ok: true, overview: buildAdminOverview(db, leaderKey) });
         }
 
         if (req.method === 'POST' && pathname === '/api/admin/workshop-hold') {
@@ -910,7 +1131,7 @@ export function createPelotonApp(options = {}) {
             DO UPDATE SET held_count = excluded.held_count, reason = excluded.reason, updated_at = excluded.updated_at
           `).run(bike.id, sz.code, heldCount, reason, nowIso());
 
-          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db) });
+          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db, leaderKey) });
         }
 
         const bookingStatusMatch = pathname.match(/^\/api\/admin\/bookings\/(\d+)\/status$/);
@@ -922,7 +1143,7 @@ export function createPelotonApp(options = {}) {
             return sendJson(res, 400, { error: 'Invalid status.' });
           }
           db.prepare('UPDATE bookings SET status = ?, updated_at = ? WHERE id = ?').run(status, nowIso(), id);
-          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db) });
+          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db, leaderKey) });
         }
 
         const rideEditMatch = pathname.match(/^\/api\/admin\/rides\/(\d+)$/);
@@ -959,7 +1180,7 @@ export function createPelotonApp(options = {}) {
             nowIso(),
             id
           );
-          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db) });
+          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db, leaderKey) });
         }
 
         if (req.method === 'PUT' && pathname === '/api/admin/planning-notes') {
@@ -969,7 +1190,7 @@ export function createPelotonApp(options = {}) {
             INSERT INTO planning_notes (id, content, updated_at) VALUES (1, ?, ?)
             ON CONFLICT(id) DO UPDATE SET content = excluded.content, updated_at = excluded.updated_at
           `).run(content, nowIso());
-          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db) });
+          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db, leaderKey) });
         }
 
         const inqMatch = pathname.match(/^\/api\/admin\/studio-inquiries\/(\d+)$/);
@@ -980,7 +1201,7 @@ export function createPelotonApp(options = {}) {
             return sendJson(res, 400, { error: 'Invalid status.' });
           }
           db.prepare('UPDATE studio_inquiries SET status = ? WHERE id = ?').run(body.status, id);
-          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db) });
+          return sendJson(res, 200, { ok: true, overview: buildAdminOverview(db, leaderKey) });
         }
       }
 
@@ -992,17 +1213,18 @@ export function createPelotonApp(options = {}) {
     }
   });
 
-  return { server, db, organizerKey };
+  return { server, db, organizerKey, leaderKey };
 }
 
 const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isDirectRun) {
   const port = Number(process.env.PORT || 3000);
-  const { server, organizerKey } = createPelotonApp();
+  const { server, organizerKey, leaderKey } = createPelotonApp();
   server.listen(port, '0.0.0.0', () => {
     console.log(`Le Peloton Café Superapp running on http://localhost:${port}`);
-    console.log(`  Storefront:  http://localhost:${port}/`);
-    console.log(`  Staff Ops:   http://localhost:${port}/admin?key=${organizerKey}`);
-    console.log(`  Stripe mode: ${isStripeConfigured() ? 'LIVE / TEST API ACTIVE' : 'INSTANT RESERVATION (set STRIPE_SECRET_KEY to enable Stripe Checkout)'}`);
+    console.log(`  Storefront:    http://localhost:${port}/`);
+    console.log(`  Ride Leaders:  http://localhost:${port}/leaders?key=${leaderKey}`);
+    console.log(`  Staff Ops:     http://localhost:${port}/admin?key=${organizerKey}`);
+    console.log(`  Stripe mode:   ${isStripeConfigured() ? 'LIVE / TEST API ACTIVE' : 'INSTANT RESERVATION (set STRIPE_SECRET_KEY to enable Stripe Checkout)'}`);
   });
 }

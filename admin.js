@@ -103,6 +103,7 @@ async function buildStaticDemoOverview() {
 
   return {
     today,
+    leaderPortalPath: './leaders.html?demo=1',
     bookings: [
       {
         id: 1,
@@ -154,6 +155,7 @@ async function buildStaticDemoOverview() {
       leaders: seed.leaders || [],
       workload: (seed.leaders || []).slice(0, 10).map((name, i) => ({ name, upcoming: i % 3, past: 6 - (i % 5), total: 6 })),
       planningNotes: { content: seed.planning_notes || '', updated_at: today },
+      recentActivity: [],
     },
     studioInquiries: [
       {
@@ -397,6 +399,151 @@ function renderClubPanel() {
   panel.replaceChildren();
   const club = state.overview.club;
 
+  const toolsCard = document.createElement('div');
+  toolsCard.className = 'admin-row-card admin-club-bar';
+
+  const linkWrap = document.createElement('div');
+  linkWrap.className = 'admin-club-links';
+  const portalHref = state.overview.leaderPortalPath || './leaders.html?demo=1';
+  const openPortal = document.createElement('a');
+  openPortal.className = 'btn-yellow';
+  openPortal.href = portalHref;
+  openPortal.target = '_blank';
+  openPortal.rel = 'noopener noreferrer';
+  openPortal.textContent = 'Open Ride Leader Portal ↗';
+
+  const copyBtn = document.createElement('button');
+  copyBtn.type = 'button';
+  copyBtn.className = 'btn-ghost';
+  copyBtn.textContent = 'Copy Leader Link';
+  copyBtn.addEventListener('click', async () => {
+    const abs = new URL(portalHref, window.location.href).href;
+    try {
+      await navigator.clipboard.writeText(abs);
+      copyBtn.textContent = 'Copied ✓';
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy Leader Link';
+      }, 1400);
+    } catch {}
+  });
+
+  const exportBtn = document.createElement('button');
+  exportBtn.type = 'button';
+  exportBtn.className = 'btn-ghost';
+  exportBtn.textContent = 'Export CSV (Sheets / Excel)';
+  exportBtn.addEventListener('click', async () => {
+    if (!state.demoMode) {
+      const resp = await fetch('./api/admin/club/export.csv', { headers: apiHeaders() });
+      if (!resp.ok) return;
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lepeloton-ride-leaders.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      return;
+    }
+    const rows = [
+      'Date,Pace,Title,Start Time,Leaders',
+      ...club.upcomingRides.map(
+        (r) => `${r.ride_date},${r.pace},"${r.title}",${r.start_time},"${(r.leaders || []).join(' / ')}"`
+      ),
+    ];
+    const blob = new Blob([rows.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'lepeloton-ride-leaders.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  linkWrap.append(openPortal, copyBtn, exportBtn);
+
+  const quickForms = document.createElement('div');
+  quickForms.className = 'admin-club-forms';
+
+  const addDateForm = document.createElement('form');
+  addDateForm.className = 'admin-inline-edit';
+  const dateInp = document.createElement('input');
+  dateInp.type = 'date';
+  dateInp.className = 'text-input';
+  dateInp.required = true;
+  dateInp.min = state.overview.today;
+  const titleInp = document.createElement('input');
+  titleInp.type = 'text';
+  titleInp.className = 'text-input';
+  titleInp.placeholder = 'New club ride title (e.g. Saturday Club Ride)';
+  const addDateBtn = document.createElement('button');
+  addDateBtn.type = 'submit';
+  addDateBtn.className = 'size-btn is-selected';
+  addDateBtn.textContent = 'Open date';
+  addDateForm.append(dateInp, titleInp, addDateBtn);
+  addDateForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const rideDate = dateInp.value;
+    const title = titleInp.value.trim() || 'Club Ride';
+    if (!rideDate) return;
+    if (state.demoMode) {
+      for (const [pace, st] of [
+        ['Spicy', '08:30'],
+        ['Medium', '09:00'],
+        ['Mild', '09:30'],
+      ]) {
+        club.upcomingRides.unshift({ id: Date.now() + Math.random(), ride_date: rideDate, pace, title, start_time: st, leaders: [] });
+      }
+      renderDashboard();
+      return;
+    }
+    const resp = await fetch('./api/admin/rides', {
+      method: 'POST',
+      headers: apiHeaders(),
+      body: JSON.stringify({ ride_date: rideDate, title }),
+    });
+    if (resp.ok) {
+      state.overview = (await resp.json()).overview;
+      renderDashboard();
+    }
+  });
+
+  const addLeaderForm = document.createElement('form');
+  addLeaderForm.className = 'admin-inline-edit admin-roster-form';
+  const rosterInp = document.createElement('input');
+  rosterInp.type = 'text';
+  rosterInp.className = 'text-input';
+  rosterInp.required = true;
+  rosterInp.placeholder = 'Add vetted ride leader to roster';
+  const addLeaderBtn = document.createElement('button');
+  addLeaderBtn.type = 'submit';
+  addLeaderBtn.className = 'size-btn is-selected';
+  addLeaderBtn.textContent = 'Add leader';
+  addLeaderForm.append(rosterInp, addLeaderBtn);
+  addLeaderForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = rosterInp.value.trim();
+    if (name.length < 2) return;
+    if (state.demoMode) {
+      if (!club.leaders.includes(name)) club.leaders.push(name);
+      rosterInp.value = '';
+      renderDashboard();
+      return;
+    }
+    const resp = await fetch('./api/admin/leaders', {
+      method: 'POST',
+      headers: apiHeaders(),
+      body: JSON.stringify({ name }),
+    });
+    if (resp.ok) {
+      state.overview = (await resp.json()).overview;
+      renderDashboard();
+    }
+  });
+
+  quickForms.append(addDateForm, addLeaderForm);
+  toolsCard.append(linkWrap, quickForms);
+  panel.appendChild(toolsCard);
+
   const layout = document.createElement('div');
   layout.className = 'cafe-studio-grid';
 
@@ -519,7 +666,26 @@ function renderClubPanel() {
   }
   wlCard.append(wlTitle, dl);
 
-  rightCol.append(notesCard, wlCard);
+  const actCard = document.createElement('div');
+  actCard.className = 'admin-row-card';
+  const actTitle = document.createElement('h3');
+  actTitle.className = 'bike-name';
+  actTitle.textContent = 'Recent Leader Activity';
+  const actList = document.createElement('ul');
+  actList.className = 'admin-prep-items';
+  for (const ev of (club.recentActivity || []).slice(0, 10)) {
+    const li = document.createElement('li');
+    li.textContent = `${ev.created_at.slice(0, 10)} · ${ev.actor}: ${ev.details}`;
+    actList.appendChild(li);
+  }
+  if (!club.recentActivity?.length) {
+    const li = document.createElement('li');
+    li.textContent = 'Leader sign-ups & withdrawals appear here in real time.';
+    actList.appendChild(li);
+  }
+  actCard.append(actTitle, actList);
+
+  rightCol.append(notesCard, wlCard, actCard);
   layout.append(leftCol, rightCol);
   panel.appendChild(layout);
 }

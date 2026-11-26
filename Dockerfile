@@ -1,7 +1,7 @@
 FROM node:24-alpine
 
 WORKDIR /app
-COPY package.json server.js db.js stripe.js data.js app.js admin.js index.html admin.html styles.css seed-club.json ./
+COPY package.json server.js db.js stripe.js data.js app.js admin.js leaders.js index.html admin.html leaders.html styles.css seed-club.json ./
 COPY assets ./assets
 
 RUN mkdir -p /app/data && chown -R node:node /app

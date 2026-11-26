@@ -9,8 +9,9 @@ cp .env.example .env
 npm start
 ```
 
-- **Storefront:** `http://localhost:3000/`
-- **Staff & Workshop Ops:** printed in terminal on boot (`http://localhost:3000/admin?key=...`)
+- **Storefront:** `http://localhost:3000/` (public Cycling Club links directly to [Strava Club](https://www.strava.com/clubs/731978), with zero internal leader exposure)
+- **Internal Ride Leaders Portal:** printed in terminal on boot (`http://localhost:3000/leaders?key=...`) — vetted roster sign-up/withdraw, optional `GOOGLE_SHEETS_WEBHOOK_URL` mirror
+- **Staff & Workshop Ops:** printed in terminal on boot (`http://localhost:3000/admin?key=...`) — includes 1-click CSV export (`/api/admin/club/export.csv`)
 - **Automated test suite:** `npm test`
 
 ## Plug-and-Play Stripe
